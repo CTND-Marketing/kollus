@@ -1,0 +1,1064 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kollus 솔루션 파인더</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --blue-50:#E6F1FB;--blue-100:#B5D4F4;--blue-200:#85B7EB;--blue-300:#5499D8;
+  --blue-500:#185FA5;--blue-700:#0C447C;--blue-900:#042C53;
+  --green-50:#EAF3DE;--green-500:#3B6D11;--green-700:#27500A;
+  --amber-50:#FAEEDA;--amber-500:#854F0B;--amber-700:#633806;
+  --pink-50:#FBEAF0;--pink-500:#993556;--pink-700:#72243E;
+  --teal-50:#E1F5EE;--teal-500:#0F6E56;--teal-700:#085041;
+  --purple-50:#EEEDFE;--purple-500:#534AB7;--purple-700:#3C3489;
+  --coral-50:#FAECE7;--coral-500:#993C1D;--coral-700:#712B13;
+  --vod-bg:#EEF5FF;--vod-border:#9FC5EE;--vod-text:#0C447C;
+  --live-bg:#FFF4E6;--live-border:#F5C275;--live-text:#633806;
+  --both-bg:#EAF3DE;--both-border:#7DB84E;--both-text:#27500A;
+  --surface:#F7F8FA;--card:#FFFFFF;--border:#E4E5EA;--border-strong:#C4C5CA;
+  --text-primary:#111118;--text-secondary:#5A5B66;--text-hint:#9A9BA6;
+  --r-sm:6px;--r-md:12px;--r-lg:20px;--r-xl:28px;--r-2xl:36px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Pretendard',-apple-system,sans-serif;background:#fff;color:var(--text-primary);min-height:100vh;line-height:1.6;-webkit-font-smoothing:antialiased}
+
+/* ── Hero ── */
+.hero{background:linear-gradient(135deg,#0a2e5c 0%,#185FA5 60%,#2e7fd4 100%);padding:5rem 0 4.5rem;text-align:center}
+.hero-inner{max-width:1200px;margin:0 auto;padding:0 2rem}
+.hero-eyebrow{font-size:13px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,.6);margin-bottom:1.25rem}
+.hero-title{font-size:3.2rem;font-weight:800;color:#fff;line-height:1.15;letter-spacing:-.03em;margin-bottom:1.25rem}
+.hero-title em{font-style:normal;color:#7EC8F8}
+.hero-desc{font-size:18px;color:rgba(255,255,255,.75);line-height:1.8;max-width:600px;margin:0 auto 2.5rem}
+.hero-steps{display:flex;align-items:center;justify-content:center;gap:0;background:rgba(255,255,255,.1);border-radius:50px;padding:.5rem 2rem;display:inline-flex}
+.hero-step{display:flex;align-items:center;gap:.6rem;padding:.5rem 1.25rem;font-size:14px;font-weight:600;color:rgba(255,255,255,.7)}
+.hero-step.active{color:#fff}
+.hero-step-num{width:26px;height:26px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
+.hero-step.active .hero-step-num{background:#fff;color:var(--blue-700)}
+.hero-step.done .hero-step-num{background:rgba(255,255,255,.5);color:#fff}
+.hero-step-sep{color:rgba(255,255,255,.3);font-size:18px;padding:0 .25rem}
+
+/* ── Main layout ── */
+.main{max-width:1200px;margin:0 auto;padding:3rem 2rem 6rem}
+
+/* ── Step panels ── */
+.step-panel{display:none;animation:fadeUp .25s ease}
+.step-panel.visible{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.step-section-title{font-size:28px;font-weight:800;color:var(--text-primary);margin-bottom:.5rem;letter-spacing:-.02em}
+.step-section-sub{font-size:16px;color:var(--text-secondary);margin-bottom:3rem;line-height:1.7}
+.step-section-sub strong{color:var(--blue-500)}
+
+/* ── Industry cards ── */
+.industry-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1.25rem;margin-bottom:2.5rem}
+.ind-card{background:#fff;border:2px solid var(--border);border-radius:var(--r-xl);padding:2.25rem 1.5rem;cursor:pointer;transition:all .2s;text-align:center;user-select:none;position:relative}
+.ind-card:hover{border-color:var(--blue-300);transform:translateY(-3px);box-shadow:0 8px 24px rgba(24,95,165,.1)}
+.ind-card.selected{border-color:var(--blue-500);background:var(--blue-50);box-shadow:0 0 0 4px rgba(24,95,165,.1)}
+.ind-card-icon{font-size:42px;line-height:1;margin-bottom:1rem;display:block}
+.ind-card-label{font-size:16px;font-weight:700;color:var(--text-primary);line-height:1.4}
+.ind-card.selected .ind-card-label{color:var(--blue-700)}
+.ind-card-check{position:absolute;top:14px;right:14px;width:22px;height:22px;border-radius:50%;background:var(--blue-500);display:none;align-items:center;justify-content:center;color:#fff;font-size:12px}
+.ind-card.selected .ind-card-check{display:flex}
+
+/* ── Mode tabs (Step2) ── */
+.mode-tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem;margin-bottom:1.5rem}
+.mode-tab{background:#fff;border:2px solid var(--border);border-radius:var(--r-xl);padding:2.5rem 1.5rem;cursor:pointer;text-align:center;user-select:none;transition:all .2s;font-family:'Pretendard',sans-serif}
+.mode-tab:hover{border-color:var(--border-strong);transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.07)}
+.tab-icon{font-size:40px;display:block;margin-bottom:1rem;line-height:1}
+.tab-label{font-size:20px;font-weight:800;color:var(--text-primary);display:block;margin-bottom:.4rem}
+.tab-sublabel{font-size:14px;color:var(--text-hint);display:block;margin-bottom:.75rem}
+.tab-count{font-size:13px;font-weight:700;padding:5px 14px;border-radius:20px;background:var(--border);color:var(--text-secondary);display:inline-block;transition:all .18s}
+.mode-tab.tab-vod.active{background:var(--vod-bg);border-color:var(--vod-border)}
+.mode-tab.tab-vod.active .tab-label{color:var(--vod-text)}
+.mode-tab.tab-vod.active .tab-count{background:var(--blue-500);color:#fff}
+.mode-tab.tab-live.active{background:var(--live-bg);border-color:var(--live-border)}
+.mode-tab.tab-live.active .tab-label{color:var(--live-text)}
+.mode-tab.tab-live.active .tab-count{background:var(--amber-500);color:#fff}
+.mode-tab.tab-both.active{background:var(--both-bg);border-color:var(--both-border)}
+.mode-tab.tab-both.active .tab-label{color:var(--both-text)}
+.mode-tab.tab-both.active .tab-count{background:var(--green-500);color:#fff}
+
+/* ── Mode desc ── */
+.mode-desc{font-size:15px;line-height:1.7;padding:14px 18px;border-radius:var(--r-md);border:1.5px solid var(--border);margin-bottom:2rem}
+.mode-desc.desc-vod{background:var(--vod-bg);border-color:var(--vod-border);color:var(--vod-text)}
+.mode-desc.desc-live{background:var(--live-bg);border-color:var(--live-border);color:var(--live-text)}
+.mode-desc.desc-both{background:var(--both-bg);border-color:var(--both-border);color:var(--both-text)}
+
+/* ── Situation items ── */
+.sel-strip{display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:12px 18px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-md);margin-bottom:2rem;min-height:48px}
+.sel-strip-lbl{font-size:12px;font-weight:700;color:var(--text-hint);text-transform:uppercase;letter-spacing:.5px;margin-right:4px;white-space:nowrap}
+.sel-pill{display:inline-flex;align-items:center;gap:5px;padding:4px 12px;border-radius:12px;font-size:13px;font-weight:500;max-width:280px}
+.sel-pill span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sel-pill-vod{background:var(--vod-bg);color:var(--vod-text);border:1px solid var(--vod-border)}
+.sel-pill-live{background:var(--live-bg);color:var(--live-text);border:1px solid var(--live-border)}
+.sel-pill-both{background:var(--both-bg);color:var(--both-text);border:1px solid var(--both-border)}
+.pill-rm{cursor:pointer;font-size:15px;line-height:1;opacity:.55;flex-shrink:0;transition:opacity .1s}
+.pill-rm:hover{opacity:1}
+.sel-none{font-size:14px;color:var(--text-hint);font-style:italic}
+
+.sit-panel{display:none}
+.sit-panel.active{display:block}
+.sit-list{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:2rem}
+.sit-item{display:flex;align-items:center;gap:14px;padding:16px 20px;border-radius:var(--r-lg);border:2px solid var(--border);cursor:pointer;background:#fff;transition:all .15s;user-select:none;min-height:64px}
+.sit-item:hover{border-color:var(--border-strong);background:var(--surface)}
+.sit-item.sel-vod{background:var(--vod-bg);border-color:var(--vod-border)}
+.sit-item.sel-live{background:var(--live-bg);border-color:var(--live-border)}
+.sit-item.sel-both{background:var(--both-bg);border-color:var(--both-border)}
+.sit-chk{width:20px;height:20px;border-radius:5px;border:2px solid var(--border-strong);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s;background:transparent}
+.sit-chk-inner{display:none;width:11px;height:11px}
+.sit-item.sel-vod .sit-chk{background:var(--blue-500);border-color:var(--blue-500)}
+.sit-item.sel-live .sit-chk{background:var(--amber-500);border-color:var(--amber-500)}
+.sit-item.sel-both .sit-chk{background:var(--green-500);border-color:var(--green-500)}
+.sit-item.sel-vod .sit-chk-inner,.sit-item.sel-live .sit-chk-inner,.sit-item.sel-both .sit-chk-inner{display:block}
+.sit-text{font-size:15px;color:var(--text-secondary);line-height:1.45}
+.sit-item.sel-vod .sit-text{color:var(--vod-text);font-weight:600}
+.sit-item.sel-live .sit-text{color:var(--live-text);font-weight:600}
+.sit-item.sel-both .sit-text{color:var(--both-text);font-weight:600}
+.sit-empty{font-size:14px;color:var(--text-hint);font-style:italic;padding:10px 2px}
+
+/* ── Results ── */
+.result-meta{font-size:15px;font-weight:600;color:var(--blue-900);margin-bottom:2rem;padding:16px 22px;background:var(--blue-50);border-radius:var(--r-md);border:1.5px solid var(--blue-200);display:flex;align-items:center;gap:10px}
+.result-meta::before{content:'';width:8px;height:8px;border-radius:50%;background:var(--blue-500);flex-shrink:0}
+.result-meta strong{color:var(--blue-700);font-weight:800}
+.result-section-label{font-size:12px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--text-hint);padding:4px 0 10px;border-bottom:2px solid var(--border);margin-bottom:1rem}
+.result-list{display:flex;flex-direction:column;gap:12px}
+.result-more-btn{width:100%;padding:18px;border-radius:var(--r-lg);border:2px solid var(--blue-200);background:var(--blue-50);font-size:15px;font-weight:700;color:var(--blue-700);cursor:pointer;font-family:'Pretendard',sans-serif;transition:all .15s;margin-top:10px;display:flex;align-items:center;justify-content:center;gap:8px}
+.result-more-btn:hover{border-color:var(--blue-500);background:var(--blue-100);color:var(--blue-900)}
+.result-rest{display:none;flex-direction:column;gap:10px;margin-top:8px}
+.result-rest.open{display:flex}
+
+/* ── Accordion card ── */
+.ac-card{background:#fff;border:2px solid var(--border);border-radius:var(--r-xl);overflow:hidden;transition:all .2s}
+.ac-card:hover{border-color:var(--border-strong);box-shadow:0 4px 16px rgba(0,0,0,.06)}
+.ac-card.top{border-color:var(--blue-200);box-shadow:0 2px 16px rgba(24,95,165,.08)}
+.ac-card.top:hover{border-color:var(--blue-400);box-shadow:0 6px 24px rgba(24,95,165,.12)}
+.ac-card.open{border-color:var(--blue-500);box-shadow:0 6px 24px rgba(24,95,165,.12)}
+.ac-card.rest{opacity:1}
+.ac-card.rest .ac-header{padding:14px 22px}
+.ac-header{display:flex;align-items:center;gap:14px;padding:22px 26px;cursor:pointer;user-select:none;transition:background .15s}
+.ac-header:hover{background:var(--surface)}
+.ac-card.open .ac-header{background:var(--blue-50)}
+.ac-left{display:flex;align-items:center;gap:14px;flex:1;min-width:0}
+.ac-rank{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;flex-shrink:0;background:var(--surface);color:var(--text-hint);border:2px solid var(--border)}
+.ac-rank-top{background:var(--blue-500);color:#fff;border-color:var(--blue-500)}
+.ac-card.top .ac-rank{width:36px;height:36px;font-size:15px;background:var(--blue-500);color:#fff;border-color:var(--blue-500)}
+.ac-card.rest .ac-rank{width:26px;height:26px;font-size:12px}
+.ac-match-badge{font-size:12px;font-weight:700;padding:4px 12px;border-radius:10px;background:var(--blue-500);color:#fff;white-space:nowrap;flex-shrink:0}
+.ac-name{font-size:18px;font-weight:700;color:var(--text-primary);line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ac-card.top .ac-name{font-size:19px;font-weight:800}
+.ac-card.rest .ac-name{font-size:16px;font-weight:600;color:var(--text-primary)}
+.ac-card.open .ac-name{color:var(--blue-700)}
+.ac-right{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.ac-mode-pill{font-size:11px;font-weight:700;padding:3px 10px;border-radius:8px}
+.pill-vod{background:var(--vod-bg);color:var(--vod-text);border:1px solid var(--vod-border)}
+.pill-live{background:var(--live-bg);color:var(--live-text);border:1px solid var(--live-border)}
+.pill-both{background:var(--both-bg);color:var(--both-text);border:1px solid var(--both-border)}
+.ac-product{font-size:13px;color:var(--text-hint);background:var(--surface);border:1.5px solid var(--border);padding:3px 10px;border-radius:10px;white-space:nowrap}
+.ac-card.open .ac-product{background:var(--blue-50);color:var(--blue-700);border-color:var(--blue-200)}
+.ac-chevron{width:20px;height:20px;display:flex;align-items:center;justify-content:center;color:var(--text-hint);transition:transform .2s;flex-shrink:0}
+.ac-card.open .ac-chevron{transform:rotate(180deg);color:var(--blue-500)}
+.ac-body{display:none;padding:0 26px 26px;border-top:1px solid var(--border)}
+.ac-card.open .ac-body{display:flex;flex-direction:column;gap:18px}
+.ac-section{display:flex;flex-direction:column;gap:8px}
+.ac-label{font-size:11px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;color:var(--text-secondary)}
+.ac-text{font-size:16px;color:var(--text-primary);line-height:1.75}
+.ac-divider{height:1px;background:var(--border);margin:2px 0}
+.ac-pos{padding:16px 20px;background:var(--blue-50);border-left:4px solid var(--blue-500);border-radius:0 var(--r-md) var(--r-md) 0;font-size:16px;color:var(--blue-900);line-height:1.8;font-style:italic;font-weight:600}
+.ac-customers{font-size:14px;color:var(--text-secondary);line-height:1.7}
+.tags{display:flex;flex-wrap:wrap;gap:6px}
+.tag{font-size:13px;padding:5px 13px;border-radius:12px;background:var(--surface);color:var(--text-primary);border:1.5px solid var(--border-strong);font-weight:500}
+
+/* ── Nav buttons ── */
+.step-nav{display:flex;align-items:center;gap:12px;margin-top:3rem;padding-top:2rem;border-top:2px solid var(--border)}
+.btn{padding:12px 24px;border-radius:var(--r-md);font-size:15px;font-weight:600;cursor:pointer;font-family:'Pretendard',sans-serif;transition:all .15s;border:2px solid var(--border);background:#fff;color:var(--text-secondary)}
+.btn:hover{background:var(--surface);color:var(--text-primary);border-color:var(--border-strong)}
+.btn-primary{background:var(--blue-500);color:#fff;border-color:var(--blue-500);padding:12px 32px}
+.btn-primary:hover{background:var(--blue-700);border-color:var(--blue-700);color:#fff}
+.btn-primary:disabled{opacity:.3;cursor:not-allowed}
+.btn-reset{margin-left:auto;font-size:14px;font-weight:600;color:var(--coral-700);background:var(--coral-50);border:2px solid var(--coral-500);border-radius:var(--r-md);padding:10px 20px}
+.btn-reset:hover{background:var(--coral-500);color:#fff}
+.btn-clear{font-size:14px;font-weight:600;color:var(--text-secondary);background:#fff;border:2px solid var(--border)}
+.btn-clear:hover{border-color:var(--border-strong);color:var(--text-primary)}
+
+/* ── Context bar ── */
+.ctx-bar{display:none;align-items:center;gap:10px;padding:12px 18px;background:#fff;border:1.5px solid var(--border);border-radius:var(--r-lg);margin-bottom:1.5rem;animation:fadeUp .2s ease}
+
+.ctx-bar-back{font-size:14px;color:var(--text-hint);cursor:pointer;padding:5px 10px;border-radius:var(--r-sm);border:1.5px solid transparent;transition:all .15s;font-family:'Pretendard',sans-serif;background:transparent;white-space:nowrap}
+.ctx-bar-back:hover{border-color:var(--border);color:var(--text-secondary);background:var(--surface)}
+.ctx-divider{width:1px;height:18px;background:var(--border);flex-shrink:0}
+.ctx-label{font-size:12px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--text-hint);white-space:nowrap}
+.ctx-chip{display:inline-flex;align-items:center;padding:5px 14px;border-radius:18px;font-size:14px;font-weight:700}
+.ctx-sits{display:flex;align-items:center;gap:6px;flex-wrap:wrap;flex:1;overflow:hidden}
+.ctx-sit-pill{font-size:12px;font-weight:400;padding:3px 10px;border-radius:10px;background:var(--surface);color:var(--text-secondary);border:1px solid var(--border);white-space:nowrap}
+.ctx-sit-pill.t-vod{background:var(--vod-bg);color:var(--vod-text);border-color:var(--vod-border)}
+.ctx-sit-pill.t-live{background:var(--live-bg);color:var(--live-text);border-color:var(--live-border)}
+.ctx-sit-pill.t-both{background:var(--both-bg);color:var(--both-text);border-color:var(--both-border)}
+.ctx-more{font-size:12px;color:var(--text-hint);white-space:nowrap}
+
+/* ── Inquiry ── */
+.inquiry-section{display:none;margin-top:2.5rem}
+.inquiry-form{padding:2.5rem;background:var(--blue-50);border:2px solid var(--blue-200);border-radius:var(--r-2xl)}
+.inquiry-form-title{font-size:28px;font-weight:800;color:var(--blue-900);margin-bottom:.6rem;letter-spacing:-.02em}
+.inquiry-form-sub{font-size:16px;color:var(--blue-700);margin-bottom:1.75rem;line-height:1.7}
+.inquiry-cols{display:grid;grid-template-columns:1fr 1fr;gap:2rem;align-items:start}
+.prefill-box{background:#fff;border:2px solid var(--blue-200);border-radius:var(--r-lg);overflow:hidden}
+.prefill-box-header{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;background:var(--blue-50);border-bottom:1px solid var(--blue-200)}
+.prefill-box-label{font-size:14px;font-weight:700;color:var(--blue-700)}
+.prefill-copy-btn{padding:8px 20px;border-radius:var(--r-sm);background:var(--blue-500);color:#fff;border:none;font-size:14px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;transition:background .15s;white-space:nowrap}
+.prefill-copy-btn:hover{background:var(--blue-700);color:#fff}
+.prefill-content{padding:18px;font-size:15px;color:var(--text-primary);line-height:2;white-space:pre-wrap;font-family:'Pretendard',sans-serif;margin:0;min-height:220px;font-weight:500}
+.prefill-copied{display:none;font-size:13px;color:var(--green-700);font-weight:700;padding:8px 18px;background:var(--green-50);border-top:1px solid var(--green-500);text-align:center}
+.pd-form-wrap{width:100%;max-width:100%}
+
+/* ── Footer ── */
+.footer{background:var(--text-primary);color:rgba(255,255,255,.5);padding:2.5rem 0;margin-top:4rem}
+.footer-inner{max-width:1200px;margin:0 auto;padding:0 2rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem}
+.footer-brand{font-size:20px;font-weight:800;color:#fff;letter-spacing:-.02em}
+.footer-text{font-size:13px}
+
+/* ── Progress in hero ── */
+#pn1,#pn2,#pn3{transition:all .2s}
+
+/* ── Empty ── */
+.empty{padding:4rem 2rem;text-align:center;color:var(--text-secondary);font-size:16px;border:2px dashed var(--border);border-radius:var(--r-xl)}
+
+@media(max-width:900px){
+  .hero-title{font-size:2.2rem}
+  .industry-grid{grid-template-columns:repeat(2,1fr)}
+  .mode-tabs{grid-template-columns:repeat(3,1fr);gap:.75rem}
+  .mode-tab{padding:1.25rem .75rem}
+  .tab-icon{font-size:28px;margin-bottom:.5rem}
+  .tab-label{font-size:15px}
+  .tab-sublabel{display:none}
+  .tab-count{font-size:12px;padding:3px 10px}
+  .sit-list{grid-template-columns:1fr}
+  .inquiry-cols{grid-template-columns:1fr}
+}
+@media(max-width:600px){
+  .hero{padding:3rem 0 3rem}
+  .hero-title{font-size:1.8rem}
+  .hero-steps{display:none}
+  .main{padding:1.5rem 1rem 4rem}
+  .industry-grid{grid-template-columns:repeat(2,1fr)}
+  .step-section-title{font-size:22px}
+  .step-section-sub{font-size:14px;margin-bottom:1.5rem}
+  .mode-tabs{grid-template-columns:repeat(3,1fr);gap:.5rem;margin-bottom:1rem}
+  .mode-tab{padding:1rem .5rem;border-radius:var(--r-lg)}
+  .tab-icon{font-size:24px;margin-bottom:.25rem}
+  .tab-label{font-size:13px;font-weight:700}
+  .tab-sublabel{display:none}
+  .tab-count{font-size:11px;padding:2px 8px}
+  .mode-desc{font-size:13px;padding:10px 14px;margin-bottom:1rem}
+  .sit-list{gap:8px}
+  .sit-item{padding:12px 14px;min-height:52px}
+  .sit-text{font-size:14px}
+  .step-nav{flex-wrap:wrap;gap:8px;margin-top:2rem;padding-top:1.25rem}
+  .btn{padding:10px 18px;font-size:14px}
+  .btn-primary{padding:10px 22px}
+  .btn-reset{margin-left:0;width:100%}
+  .ac-header{padding:16px 18px}
+  .ac-name{font-size:15px}
+  .ac-body{padding:0 16px 18px}
+  .inquiry-form{padding:1.5rem}
+  .inquiry-form-title{font-size:22px}
+}
+</style>
+</head>
+<body>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-eyebrow">Kollus · Solution Finder</div>
+    <h1 class="hero-title">우리 비즈니스에 꼭 맞는<br><em>동영상 솔루션</em>을 찾아보세요</h1>
+    <p class="hero-desc">15년 노하우의 콜러스 기술로 비즈니스에 맞는 솔루션을 찾아보세요.<br>산업, 상황을 선택하면 적합한 유스케이스와 솔루션을 확인할 수 있습니다.</p>
+    <div class="hero-steps">
+      <div class="hero-step active" id="hs1">
+        <div class="hero-step-num" id="pn1">1</div>
+        <span id="pl1">산업 선택</span>
+      </div>
+      <span class="hero-step-sep">›</span>
+      <div class="hero-step" id="hs2">
+        <div class="hero-step-num" id="pn2">2</div>
+        <span id="pl2">상황 / 니즈</span>
+      </div>
+      <span class="hero-step-sep">›</span>
+      <div class="hero-step" id="hs3">
+        <div class="hero-step-num" id="pn3">3</div>
+        <span id="pl3">솔루션 확인</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="main">
+
+  <!-- Context bar -->
+  <div class="ctx-bar" id="ctx-bar">
+    <button class="ctx-bar-back" onclick="goStep(1)">← 산업 변경</button>
+    <div class="ctx-divider"></div>
+    <span class="ctx-label">선택 산업</span>
+    <span class="ctx-chip" id="ctx-chip"></span>
+    <div class="ctx-divider" id="ctx-sits-divider" style="display:none"></div>
+    <div class="ctx-sits" id="ctx-sits"></div>
+  </div>
+
+  <!-- Step 1 -->
+  <div class="step-panel visible" id="step1">
+    <h2 class="step-section-title">어떤 산업에서 서비스를 운영하고 계신가요?</h2>
+    <p class="step-section-sub">산업을 선택하면 해당 분야에 맞는 상황과 기능이 <strong>자동으로 필터링</strong>됩니다</p>
+    <div class="industry-grid" id="industry-grid"></div>
+    <div class="step-nav">
+      <button class="btn btn-primary" id="next1" disabled onclick="goStep(2)">다음 단계 →</button>
+    </div>
+  </div>
+
+  <!-- Step 2 -->
+  <div class="step-panel" id="step2">
+    <h2 class="step-section-title">현재 어떤 상황이나 니즈가 있으신가요?</h2>
+    <p class="step-section-sub">운영 방식 탭을 먼저 선택한 뒤 해당하는 상황을 골라주세요 — 탭은 자유롭게 오가며 <strong>복수 선택 가능</strong></p>
+    <div class="mode-tabs">
+      <button class="mode-tab tab-vod active" id="tab-vod" onclick="switchTab('vod')">
+        <span class="tab-icon">🎬</span>
+        <span class="tab-label">VOD</span>
+        <span class="tab-sublabel">녹화·다시보기 영상</span>
+        <span class="tab-count" id="cnt-vod">0</span>
+      </button>
+      <button class="mode-tab tab-live" id="tab-live" onclick="switchTab('live')">
+        <span class="tab-icon">📡</span>
+        <span class="tab-label">LIVE</span>
+        <span class="tab-sublabel">실시간 방송·스트리밍</span>
+        <span class="tab-count" id="cnt-live">0</span>
+      </button>
+      <button class="mode-tab tab-both" id="tab-both" onclick="switchTab('both')">
+        <span class="tab-icon">⚡</span>
+        <span class="tab-label">VOD + LIVE</span>
+        <span class="tab-sublabel">두 방식을 함께 운영</span>
+        <span class="tab-count" id="cnt-both">0</span>
+      </button>
+    </div>
+    <div id="desc-vod" class="mode-desc desc-vod">미리 촬영·편집된 영상을 원하는 시간에 반복 시청하는 서비스입니다. 이러닝, 강의 다시보기, 도서 부록 영상, OTT 등이 해당합니다.</div>
+    <div id="desc-live" class="mode-desc desc-live" style="display:none">실시간으로 방송하고 시청자가 동시에 접속하는 서비스입니다. 라이브 강의, 타운홀, 공연 중계, 라이브커머스 등이 해당합니다.</div>
+    <div id="desc-both" class="mode-desc desc-both" style="display:none">라이브 방송과 VOD 다시보기를 함께 운영하거나, 라이브 종료 후 자동으로 VOD로 전환이 필요한 경우입니다.</div>
+    <div class="sel-strip" id="sel-strip"><span class="sel-none">아직 선택한 상황이 없습니다</span></div>
+    <div class="sit-panel active" id="panel-vod"><div class="sit-list" id="list-vod"></div></div>
+    <div class="sit-panel" id="panel-live"><div class="sit-list" id="list-live"></div></div>
+    <div class="sit-panel" id="panel-both"><div class="sit-list" id="list-both"></div></div>
+    <div class="step-nav">
+      <button class="btn" onclick="goStep(1)">← 이전</button>
+      <button class="btn btn-primary" id="next2" disabled onclick="goStep(3)">솔루션 보기 →</button>
+      <button class="btn btn-reset" onclick="clearSits()">선택 초기화</button>
+    </div>
+  </div>
+
+  <!-- Step 3 -->
+  <div class="step-panel" id="step3">
+    <h2 class="step-section-title">매칭된 솔루션</h2>
+    <p class="step-section-sub">선택하신 조건과 가장 잘 맞는 유스케이스입니다.</p>
+    <div id="results-area"></div>
+    <div class="step-nav">
+      <button class="btn" onclick="goStep(2)">← 조건 수정</button>
+      <button class="btn btn-reset" onclick="reset()">처음부터 다시</button>
+    </div>
+  </div>
+
+  <!-- 견적 문의 영역 -->
+  <div class="inquiry-section" id="inquiry-section">
+    <div class="inquiry-form">
+      <div class="inquiry-form-title">견적 문의하기</div>
+      <div class="inquiry-form-sub">선택하신 조건을 복사해서 <strong style="color:var(--blue-900);font-weight:800;text-decoration:underline;text-underline-offset:3px">문의 내용</strong>란에 붙여넣어 주세요. 담당자가 빠르게 확인합니다.</div>
+      <div class="inquiry-cols">
+        <div class="prefill-box">
+          <div class="prefill-box-header">
+            <span class="prefill-box-label">📋 선택하신 조건 — 복사 후 붙여넣기</span>
+            <button class="prefill-copy-btn" onclick="copyPrefill()">복사하기</button>
+          </div>
+          <pre class="prefill-content" id="prefill-content"></pre>
+          <div class="prefill-copied" id="prefill-copied">✓ 복사되었습니다</div>
+        </div>
+        <div class="pd-form-wrap">
+          <div class="pipedriveWebForms" data-pd-webforms="https://webforms.pipedrive.com/f/1tgdA9o87kotVaCRBf8cDwNi0X9oUUMVHOWcVzKi1KgnqdCbGH0spcWwxsQPufFfB"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /main -->
+
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-brand">Kollus</div>
+    <div class="footer-text">국내 No.1 동영상 플랫폼 콜러스</div>
+  </div>
+</footer>
+
+
+<script src="https://webforms.pipedrive.com/f/loader"></script>
+<script>
+const INDUSTRIES=[
+  {id:"edu",   label:"온라인 교육",             col:"blue"},
+  {id:"corp",  label:"기업 / 공공 교육",         col:"green"},
+  {id:"bcast", label:"기업 방송 / 커뮤니케이션",  col:"amber"},
+  {id:"comm",  label:"비디오 커머스",             col:"pink"},
+  {id:"live",  label:"라이브 스트리밍",           col:"teal"},
+  {id:"ott",   label:"OTT 서비스",               col:"purple"},
+  {id:"event", label:"공연 / 행사",              col:"coral"},
+];
+
+const UC=[
+  /* ── 온라인 교육 (edu) ── */
+  {id:"uc01",ind:"edu",mode:"both",name:"입시·어학 이러닝 스트리밍 서비스",
+   sitVod:["콘텐츠 불법 유출 / 녹화 방지가 필요해요","강사 정산을 위한 정확한 진도율 데이터가 필요해요","AI 자막으로 운영 리소스를 줄이고 싶어요"],
+   sitLive:["수험 시즌 대규모 동시 접속이 걱정돼요","라이브 강의 / 웨비나 중 콘텐츠 유출을 방지해야 해요"],
+   sitBoth:[],
+   features:{"보안":["콘텐츠 암호화 (DRM)","녹화 차단","기기 대수 제한","계정 공유 차단","동시 시청 제한","워터마킹"],"스트리밍":["대규모 트래픽 / CDN","VOD / 다시보기"],"플레이어":["배속 재생 / 이어보기","모바일 최적화"],"데이터":["진도율 정밀 데이터","통계 / 리포트"]},
+   product:"Kollus DRM / Multi DRM",
+   situation:"스타 강사 IP 보호 최우선. 불법 녹화·계정 공유로 매출 손실. 수능·방학 시즌 수만 명 동시 접속. OTT 수준 플레이어 경험 요구.",
+   position:"스타 강사의 IP를 지키고 수능 당일 수만 명이 몰려도 끊기지 않는 안정성, AI 자막으로 운영 비용까지 절감",
+   customers:"메가스터디교육, 이투스에듀, 제우스교육, 단꿈아이, 하이테커, 린치핀에듀, 마스터프랩(글로벌), 강남인강, 경선식에듀, 야나두, 하위잉글리시, 아이비김영, 시사아카데미, YBMnet"},
+  {id:"uc02",ind:"edu",mode:"vod",name:"학원 온오프라인 통합 스트리밍 서비스",
+   sitVod:["오프라인 수업을 빠르게 VOD로 제공해야 해요","콘텐츠 불법 유출 / 녹화 방지가 필요해요","강사 정산을 위한 정확한 진도율 데이터가 필요해요"],
+   sitLive:[],sitBoth:[],
+   features:{"보안":["콘텐츠 암호화 (DRM)","녹화 차단","기기 대수 제한"],"스트리밍":["VOD / 다시보기","대규모 트래픽 / CDN"],"플레이어":["배속 재생 / 이어보기","모바일 최적화"],"데이터":["진도율 정밀 데이터"]},
+   product:"Kollus DRM",
+   situation:"오프라인 수업 직후 결석생·복습 영상 즉시 제공 필요. 수동 공유로는 외부 유출 통제 불가. 운영 인력 개입 최소화.",
+   position:"수업 직후 업로드 → 자동 인코딩 → 학원 앱 즉시 게시. 보안 유지하면서 운영 인력 개입 제로",
+   customers:"시대인재, 대교(러닝센터), 메가스터디 러셀, 이투스에듀, 디쉐어, 한국경찰학원, 와우고시, 그레이프씨드 코리아"},
+  {id:"uc03",ind:"edu",mode:"vod",name:"도서 연계 동영상 제공 서비스",
+   sitVod:["도서 부록 영상을 안전하게 배포하고 싶어요","학기 초 / 시험 기간 트래픽 급증이 걱정돼요","다국어 또는 오디오 모드 학습이 필요해요"],
+   sitLive:[],sitBoth:[],
+   features:{"보안":["콘텐츠 암호화 (DRM)","녹화 차단"],"스트리밍":["링크 기반 스트리밍","VOD / 다시보기","대규모 트래픽 / CDN"],"플레이어":["다국어 자막","오디오 모드"],"데이터":[]},
+   product:"Kollus DRM",
+   situation:"도서 부록 영상 불법 유출 빈번. 학기 초·시험기간 트래픽 급증. 오디오 단독 스트리밍·다국어 자막 복합 요구.",
+   position:"교재 구매자 전용 콘텐츠를 클릭 한 번에 안전하게. 오디오 모드·다국어 자막으로 학습 효율까지",
+   customers:"키출판사, 개념원리, 아이지니"},
+  {id:"uc04",ind:"edu",mode:"both",name:"진로진학 커뮤니케이션 서비스",
+   sitVod:[],
+   sitLive:["실시간 라이브 강의 + 채팅 Q&A가 필요해요","수험 시즌 대규모 동시 접속이 걱정돼요","라이브 강의 / 웨비나 중 콘텐츠 유출을 방지해야 해요"],
+   sitBoth:["라이브 종료 후 VOD 다시보기를 바로 제공해야 해요"],
+   features:{"보안":["콘텐츠 암호화 (DRM)","녹화 차단"],"스트리밍":["저지연 라이브 (LIVE)","ABR 자동 화질 전환","대규모 트래픽 / CDN","VOD / 다시보기"],"플레이어":["라이브 채팅 / Q&A","모바일 최적화"],"데이터":["통계 / 리포트","전담 헬프데스크"]},
+   product:"Kollus DRM / 미디어인증",
+   situation:"학교 방송실에서 전국 고교생 대상 실시간 진로 강의. 1시간 강의 + 30분 Q&A 구조. 실시간 채팅 양방향 소통 필수.",
+   position:"전국 어디서나 접속해도 끊기지 않는 라이브 강의. 실시간 Q&A로 현장감 있는 진로 교육",
+   customers:"강동구청(진로진학), 유니브"},
+  {id:"uc05",ind:"edu",mode:"vod",name:"사이버대학교·평생교육원 이러닝 서비스",
+   sitVod:["시청각 장애 학습자도 동등하게 수강할 수 있어야 해요","강사 정산을 위한 정확한 진도율 데이터가 필요해요","링크 기반으로 외부 시스템에 영상을 제공해야 해요"],
+   sitLive:[],sitBoth:[],
+   features:{"보안":["콘텐츠 암호화 (DRM)"],"스트리밍":["링크 기반 스트리밍","VOD / 다시보기"],"플레이어":["장애인 학습자용 웹접근성 플레이어","스크린 리더 연동","AI 자동 자막","다국어 자막","360VR 플레이어"],"데이터":["진도율 정밀 데이터"]},
+   product:"Kollus DRM + Help Desk",
+   situation:"강의 100% VOD. 장애인 학생 수천 명 웹접근성 법적 요구. 컨소시엄 대학 영상 제공. 콜센터 CS 50명+.",
+   position:"장애인 포함 모든 학습자가 동등하게 수강. 웹접근성 품질인증 마크 획득 지원",
+   customers:"한국열린사이버대학교, 남서울대 원격평생교육원, 인천인재평생교육진흥원"},
+  {id:"uc06",ind:"edu",mode:"vod",name:"공무원·전문직 이러닝 스트리밍 서비스",
+   sitVod:["콘텐츠 불법 유출 / 녹화 방지가 필요해요","강사 정산을 위한 정확한 진도율 데이터가 필요해요","학기 초 / 시험 기간 트래픽 급증이 걱정돼요"],
+   sitLive:[],sitBoth:[],
+   features:{"보안":["콘텐츠 암호화 (DRM)","워터마킹","동시 시청 제한"],"스트리밍":["대규모 트래픽 / CDN","VOD / 다시보기"],"플레이어":["배속 재생 / 이어보기","모바일 최적화"],"데이터":["진도율 정밀 데이터","통계 / 리포트"]},
+   product:"Kollus DRM",
+   situation:"고가 수험 강의 콘텐츠 보안 최우선. 시험 시즌 대규모 동시 접속. 강사 정산을 위한 정교한 진도율 데이터 필요.",
+   position:"합격을 향한 고가 강의, 보안은 기본 — 대규모 수험 트래픽에도 끊기지 않는 안정성",
+   customers:"메가엠디/랜드, ST Unitas, 경찰단기, 한솔아카데미, 지스쿨, 올배움, 모아소방전문학원, 프라임에듀넷, 시대교육, 지안에듀, 링커리어"},
+  {id:"uc07",ind:"edu",mode:"both",name:"직무 관련 이러닝 스트리밍 서비스 (국내)",
+   sitVod:["콘텐츠 불법 유출 / 녹화 방지가 필요해요","강사 정산을 위한 정확한 진도율 데이터가 필요해요"],
+   sitLive:["라이브 강의 / 웨비나 중 콘텐츠 유출을 방지해야 해요"],
+   sitBoth:["기존 LMS / 인트라넷과 API로 연동해야 해요"],
+   features:{"보안":["콘텐츠 암호화 (DRM)","녹화 차단","패턴 차단"],"스트리밍":["VOD / 다시보기","링크 기반 스트리밍"],"플레이어":["배속 재생 / 이어보기","멀티디바이스 지원"],"데이터":["진도율 정밀 데이터","통계 / 리포트","API / LMS 연동"]},
+   product:"Kollus DRM",
+   situation:"강사 IP 보호 최우선. 강사별 수익 배분 정산을 위한 정교한 진도율 필요. API 기반 자동 업로드·트랜스코딩 워크플로우.",
+   position:"강사의 저작권을 DRM으로 보호하고, 수익 배분 정산의 근거가 되는 초 단위 진도율 데이터 제공",
+   customers:"탈잉, 디쉐어, 링커리어, 아이지엠세계경영연구원, 윌비스, YBMNet, 렛유인, 데이원컴퍼니, ECK교육, 덴탈빈, 메디스트림, 데니어, 메디칼타임즈"},
+  {id:"uc08",ind:"edu",mode:"vod",name:"직무 관련 이러닝 스트리밍 서비스 (글로벌)",
+   sitVod:["글로벌 수강생에게 서비스를 제공해야 해요","AI 자막으로 운영 리소스를 줄이고 싶어요"],
+   sitLive:[],sitBoth:[],
+   features:{"보안":["콘텐츠 암호화 (DRM)"],"스트리밍":["글로벌 CDN","ABR 자동 화질 전환","VOD / 다시보기"],"플레이어":["HTML5 표준 플레이어","다국어 자막"],"데이터":["통계 / 리포트","채널 / 계정 관리","복수 담당자 로그인"]},
+   product:"Multi DRM + 글로벌 CDN",
+   situation:"국내 B2C → B2B → 글로벌 B2C 성장. 글로벌 CDN·다국어 자막이 핵심. 광고 삽입 기능 검토 중.",
+   position:"국내에서 글로벌로 확장할 때 화질·자막·보안 모두 국제 표준으로",
+   customers:"데이원컴퍼니(콜로소), 웅진컴퍼스"},
+  {id:"uc09",ind:"edu",mode:"vod",name:"투자·재테크·헬스케어 스트리밍 서비스",
+   sitVod:["콘텐츠 불법 유출 / 녹화 방지가 필요해요","멀티 디바이스 사용과 계정 공유를 차단하고 싶어요"],
+   sitLive:[],sitBoth:[],
+   features:{"보안":["콘텐츠 암호화 (DRM)","녹화 차단","기기 대수 제한","계정 공유 차단","동시 시청 제한","워터마킹"],"스트리밍":["VOD / 다시보기","대규모 트래픽 / CDN"],"플레이어":["모바일 최적화"],"데이터":[]},
+   product:"Kollus DRM",
+   situation:"고가 투자 강의 불법 유출 시 매출 직접 타격. 아이디 공유 빈번. 투자 이슈 시 접속 폭주. 멀티디바이스 화면 캡처 차단 필수.",
+   position:"재테크 강의의 핵심 자산을 DRM + 캡처 차단으로 완벽 보호. 계정 공유 원천 차단으로 매출 누수 방지",
+   customers:"월급쟁이부자들, 3ProTV, KB증권방송, 로프트아일랜드, 용감한컴퍼니"},
+
+  /* ── 기업 / 공공 교육 (corp) ── */
+  {id:"uc11",ind:"corp",mode:"both",name:"기업 내부 교육 (HRD)",
+   sitVod:["사내 교육 영상에 기밀 정보가 포함되어 보안이 중요해요","AI 자막으로 운영 리소스를 줄이고 싶어요"],
+   sitLive:[],
+   sitBoth:["기존 LMS / 인트라넷과 API로 연동해야 해요"],
+   features:{"보안":["콘텐츠 암호화 (DRM)","녹화 차단","내부망 접근 제한"],"스트리밍":["VOD / 다시보기","링크 기반 스트리밍","대규모 트래픽 / CDN"],"플레이어":["HTML5 표준 플레이어"],"데이터":["진도율 정밀 데이터","API / LMS 연동","CMS API 연동"]},
+   product:"미디어인증(재생URL) + API",
+   situation:"사내 교육 영상에 기밀·신제품 정보 포함. 외부 유출 시 막대한 손실. 기존 보안 솔루션과 플레이어 충돌 방지.",
+   position:"기업 기밀을 지키는 DRM. 기존 LMS와 충돌 없는 매끄러운 연동",
+   customers:"삼성전자판매, CJ올리브영, KOICA, 한국컴패션"},
+  {id:"uc12",ind:"corp",mode:"vod",name:"프랜차이즈·가맹점주 교육",
+   sitVod:["가맹점주가 모바일로 간편하게 교육받게 하고 싶어요","링크 하나로 교육 영상을 간편하게 공유하고 싶어요"],
+   sitLive:[],
+   sitBoth:["기존 LMS / 인트라넷과 API로 연동해야 해요"],
+   features:{"보안":[],"스트리밍":["링크 기반 스트리밍","VOD / 다시보기"],"플레이어":["모바일 최적화"],"데이터":["진도율 정밀 데이터","API / LMS 연동"]},
+   product:"Kollus API + 미디어링크 콜백",
+   situation:"매장에서 매뉴얼·레시피를 시청할 PC 환경 부재. 가맹점주 포털 로그인 후 모바일로 간편 학습.",
+   position:"본사 포털 API 연동으로 가맹점주가 스마트폰 하나로 모든 교육 자료를 학습",
+   customers:"노랑푸드, 투썸플레이스, 한솔교육"},
+  {id:"uc13",ind:"corp",mode:"both",name:"전문 협회·단체 보수 교육",
+   sitVod:["협회 회원 보수 교육을 비용 효율적으로 운영해야 해요","CS 전담 인력 없이 안정적으로 운영할 수 있어야 해요","AI 자막으로 운영 리소스를 줄이고 싶어요"],
+   sitLive:["별도 IT 인력 없이 라이브 방송을 안정적으로 운영해야 해요"],
+   sitBoth:[],
+   features:{"보안":["원타임 URL"],"스트리밍":["VOD / 다시보기","저지연 라이브 (LIVE)","링크 기반 스트리밍"],"플레이어":["HTML5 표준 플레이어","장애인 학습자용 웹접근성 플레이어"],"데이터":[]},
+   product:"Multi DRM or Not (종량제)",
+   situation:"CS 전담 인력 없어 안정성·Help Desk 최우선. 회비 운영 조직 특성상 종량제 과금 선호.",
+   position:"IT 담당자 없이도 안정적으로 운영. 시청 데이터만큼만 과금하는 합리적 구조",
+   customers:"대한법무사협회, 한국세무사회, 개인정보보호협회, 미국골프지도자연맹, 한국식품산업협회, 건설산업교육원, 한국베터리산업협회"},
+
+  /* ── 기업 방송 / 커뮤니케이션 (bcast) ── */
+  {id:"uc10",ind:"bcast",mode:"both",name:"법정·안전 의무 교육",
+   sitVod:["법정 의무 교육 진도율을 법적 증빙으로 활용해야 해요","AI 자막으로 운영 리소스를 줄이고 싶어요"],
+   sitLive:["분기말·연말 대규모 동시 접속에도 끊김 없이 서비스되어야 해요"],sitBoth:[],
+   features:{"보안":["콘텐츠 암호화 (DRM)"],"스트리밍":["대규모 트래픽 / CDN","VOD / 다시보기"],"플레이어":[],"데이터":["진도율 정밀 데이터"]},
+   product:"Kollus DRM (VOD)",
+   situation:"분기말·연말 전 직원 동시 접속. 버퍼링 시 담당자 업무 마비. 진도율 오류 → 과태료 리스크.",
+   position:"진도율 1%도 틀리지 않는 정확한 데이터. 연말 전 직원 동시 접속에도 흔들리지 않는 인프라",
+   customers:"현대자동차, 한국가스안전공사, 한국해양수산연수원, 국민연금공단, 노사발전재단, 대한체육회, 모트라스, 사학진흥재단, 건설산업교육원"},
+  {id:"uc14",ind:"bcast",mode:"both",name:"타운홀 등 기업 커뮤니케이션",
+   sitVod:[],
+   sitLive:["전 직원 타운홀 방송을 안정적으로 송출해야 해요","오프라인 행사와 온라인 스트리밍을 함께 운영해야 해요","내부 임직원에게만 라이브 접근을 제한해야 해요"],
+   sitBoth:["방송 후 VOD 아카이브를 내부망에서만 볼 수 있어야 해요","AI 자막으로 운영 리소스를 줄이고 싶어요"],
+   features:{"보안":["콘텐츠 암호화 (DRM)","내부망 접근 제한"],"스트리밍":["저지연 라이브 (LIVE)","대규모 트래픽 / CDN","VOD / 다시보기"],"플레이어":["라이브 채팅 / Q&A","퀴즈 / 설문"],"데이터":[]},
+   product:"미디어인증(재생URL)",
+   situation:"평소 수백 명 → 타운홀 당일 수천 명 급증. 오프라인 송출 파트너사와 턴키 제안 구조.",
+   position:"타운홀 당일 수천 명이 몰려도 끊기지 않는 안정성. 내부망 제한으로 외부 유출 원천 차단",
+   customers:"아모레퍼시픽, KTCS, 삼성전자판매"},
+  {id:"uc15",ind:"bcast",mode:"live",name:"주주총회 · 민감 정보 공유",
+   sitVod:[],
+   sitLive:["주주총회 / 민감 정보를 인가된 대상에게만 공유해야 해요","저지연 라이브로 오프라인과 실시간 동기화가 필요해요","글로벌 시청자에게 다국어 자막과 함께 송출해야 해요","라이브 중 비인가자 접근 및 녹화를 차단해야 해요"],
+   sitBoth:[],
+   features:{"보안":["콘텐츠 암호화 (DRM)","사번 / 회원 인증","내부망 접근 제한","녹화 차단"],"스트리밍":["저지연 라이브 (LIVE)","대규모 트래픽 / CDN"],"플레이어":["다국어 자막","라이브 채팅 / Q&A","퀴즈 / 설문"],"데이터":[]},
+   product:"Kollus DRM / Multi DRM",
+   situation:"전자주총 의무화로 수요 급증. 수십~수백 개 방송 동시 생성 필요. 저지연 라이브 + 비인가자 차단.",
+   position:"주총 시즌 수백 개 방송 동시 송출. 저지연으로 오프라인과 실시간 동기화",
+   customers:"LG에너지솔루션, 메먼트"},
+  {id:"uc16",ind:"bcast",mode:"vod",name:"기업·공공 홍보 영상 서비스",
+   sitVod:["홍보 영상을 설치·로그인 없이 즉시 재생되게 하고 싶어요","공공기관 구형 브라우저에서도 재생되어야 해요","영상의 구간별 시청 현황과 지역 데이터를 분석하고 싶어요"],
+   sitLive:[],sitBoth:[],
+   features:{"보안":[],"스트리밍":["링크 기반 스트리밍","VOD / 다시보기"],"플레이어":["HTML5 표준 플레이어","장애인 학습자용 웹접근성 플레이어","모바일 최적화"],"데이터":["시청 통계 / 지역 분석"]},
+   product:"Kollus 동영상 호스팅",
+   situation:"홍보 목적 → 로그인·설치 없이 클릭 즉시 재생 필수. 구형 관공서 브라우저 호환 필요.",
+   position:"설치도 로그인도 없이 클릭 한 번에 재생. 구형 브라우저에서도 동일한 화질 보장",
+   customers:"현대카드, 기획재정부, 안양시청, 의정부시청, 한국여성인권진흥원, 신세계아이앤씨(POS)"},
+
+  /* ── 비디오 커머스 (comm) ── */
+  {id:"uc17",ind:"comm",mode:"live",name:"라이브 커머스 서비스",
+   sitVod:[],
+   sitLive:["끊김 없는 실시간 라이브커머스 방송이 필요해요","SMB 고객이 핸드폰으로 간편하게 방송을 시작하게 해야 해요","대기업 D2C 자사몰에 라이브를 API로 연동해야 해요"],
+   sitBoth:[],
+   features:{"보안":[],"스트리밍":["저지연 라이브 (LIVE)","대규모 트래픽 / CDN"],"플레이어":["라이브 채팅 / Q&A","모바일 최적화"],"데이터":["API / LMS 연동"]},
+   product:"Kollus Live Commerce",
+   situation:"SMB는 핸드폰 방송 즉시 시작 선호. 대기업은 D2C 자사몰 API 연동 턴키 필요.",
+   position:"핸드폰으로 즉시 시작하는 SMB 라이브부터 대기업 D2C 자사몰 완전 연동까지",
+   customers:"노랑풍선"},
+  {id:"uc18",ind:"comm",mode:"vod",name:"상품 영상 / 후기 서비스",
+   sitVod:["고화질 상품 영상으로 구매 전환율을 높이고 싶어요","빠른 인코딩과 안정적인 영상 호스팅이 필요해요","짧은 영상을 웹페이지에 넣고 싶어요"],
+   sitLive:[],sitBoth:[],
+   features:{"보안":[],"스트리밍":["링크 기반 스트리밍","VOD / 다시보기","ABR 자동 화질 전환"],"플레이어":["웹페이지 삽입","모바일 최적화"],"데이터":[]},
+   product:"찰나(Charlla)",
+   productAlt:"Kollus Live Commerce",
+   charllaSits:["짧은 영상을 웹페이지에 넣고 싶어요"],
+   charllaFeats:["웹페이지 삽입"],
+   situation:"상품 상세페이지 영상 품질이 구매 전환율에 직결. 빠른 인코딩·안정적 호스팅으로 운영 리소스 절감. 짧은 영상 웹페이지 삽입 수요 증가.",
+   position:"상품 영상 하나가 구매 전환율을 가른다. 짧은 영상부터 고화질 상품 영상까지, 찰나(Charlla)로 운영 부담 제로",
+   customers:"신성통상, 아난티"},
+
+  /* ── 라이브 스트리밍 (live) ── */
+  {id:"uc19",ind:"live",mode:"both",name:"방송 채널 웹 서비스 (24/7)",
+   sitVod:["방송 콘텐츠를 VOD로 아카이브해 다시 볼 수 있어야 해요"],
+   sitLive:["24시간 방송 채널을 끊김 없이 운영해야 해요","글로벌 시청자에게 안정적으로 송출해야 해요","라이브 스트림 URL을 외부에서 무단 사용하지 못하게 해야 해요","TV · 웹 · 모바일 앱 멀티채널을 동시에 운영해야 해요"],
+   sitBoth:[],
+   features:{"보안":["원타임 URL","재생 URL 암호화"],"스트리밍":["글로벌 CDN","저지연 라이브 (LIVE)","24/7 안정 운영","ABR 자동 화질 전환"],"플레이어":[],"데이터":[]},
+   product:"Multi DRM + 글로벌 CDN",
+   situation:"글로벌 시청자 대상 24시간 라이브. '항상 끊기지 않는 방송'이 최우선. 웹·모바일·스마트TV 멀티채널.",
+   position:"24시간, 전 세계 어디서나 — 단 한 번의 끊김도 허용하지 않는 라이브 인프라",
+   customers:"아리랑TV, 바둑TV"},
+  {id:"uc20",ind:"live",mode:"both",name:"온라인 홈쇼핑 서비스",
+   sitVod:[],
+   sitLive:["동시 접속자 수만 명을 처리해야 해요","TV · 웹 · 모바일 앱 멀티채널을 동시에 운영해야 해요"],
+   sitBoth:[],
+   features:{"보안":[],"스트리밍":["대규모 트래픽 / CDN","저지연 라이브 (LIVE)","ABR 자동 화질 전환"],"플레이어":["HTML5 표준 플레이어","라이브 채팅 / Q&A","모바일 최적화"],"데이터":["통계 / 리포트","구매 페이지 연동"]},
+   product:"미디어인증(재생URL)",
+   situation:"TV·PC웹·모바일앱 채널 동시 운영. 효자상품 방송 시 동시 접속자 1만~7만 명 급증. 비설치형 HTML5 플레이어 선호.",
+   position:"동시 접속 7만 명에도 흔들리지 않는 CDN. TV에서 모바일까지 동일한 시청 경험",
+   customers:"공영홈쇼핑, 우리홈쇼핑"},
+
+  /* ── OTT (ott) ── */
+  {id:"uc21",ind:"ott",mode:"vod",name:"영화·드라마 구독형 OTT 서비스",
+   sitVod:["다양한 디바이스에서 고화질 스트리밍을 제공해야 해요","OTT 서비스를 빠르게 론칭하고 싶어요","멀티 디바이스 사용과 계정 공유를 차단하고 싶어요"],
+   sitLive:[],sitBoth:[],
+   features:{"보안":["콘텐츠 암호화 (DRM)","원타임 URL","동시 시청 제한"],"스트리밍":["ABR 자동 화질 전환","글로벌 CDN","VOD / 다시보기"],"플레이어":["HTML5 표준 플레이어","플레이어 커스텀 (브랜드 컬러)","배속 재생 / 이어보기"],"데이터":[]},
+   product:"Multi DRM + ABR 스트리밍",
+   situation:"멀티 비트레이트 자동 변환·ABR 스트리밍. 브랜드 컬러 플레이어 커스텀. 요금제별 동시 재생 기기 수 제어.",
+   position:"원본 업로드 하나로 멀티 비트레이트 변환, 브랜드 플레이어, Multi DRM까지 — OTT 론칭 기술 장벽 제거",
+   customers:"아시아N(moa-play), 미디어엘리트(채널W)"},
+  {id:"uc22",ind:"ott",mode:"vod",name:"UGC / 리뷰 스트리밍 서비스",
+   sitVod:["사용자 업로드 영상을 자동으로 인코딩·배포해야 해요","대용량 영상을 빠르게 처리하고 안정적으로 스트리밍해야 해요"],
+   sitLive:[],sitBoth:[],
+   features:{"보안":[],"스트리밍":["대규모 트래픽 / CDN","링크 기반 스트리밍","VOD / 다시보기"],"플레이어":[],"데이터":["API / LMS 연동"]},
+   product:"Kollus API + 트랜스코딩",
+   situation:"대량 사용자 업로드 영상을 API로 자동 수집·트랜스코딩·배포. 안정적 스트리밍과 API 유연성이 핵심.",
+   position:"대량 UGC를 API 하나로 자동 수집·인코딩·배포. 운영 인력 개입 없는 자동화 파이프라인",
+   customers:"스마일게이트홀딩스"},
+  {id:"uc23",ind:"ott",mode:"vod",name:"콘텐츠 배급 / 심사 서비스 (글로벌)",
+   sitVod:["글로벌 배급 / 콘텐츠 심사 환경이 필요해요"],
+   sitLive:[],sitBoth:[],
+   features:{"보안":["사번 / 회원 인증"],"스트리밍":["글로벌 CDN","ABR 자동 화질 전환","VOD / 다시보기"],"플레이어":["HTML5 표준 플레이어","장애인 학습자용 웹접근성 플레이어"],"데이터":[]},
+   product:"글로벌 CDN + 웹 표준 플레이어",
+   situation:"전 세계 감독·심사위원 분산. 대용량 영상 글로벌 업로드·시청 필요. 국가별 네트워크 차이 문제.",
+   position:"전 세계 어디서나 설치 없이 웹 브라우저로 즉시 고화질 심사 가능",
+   customers:"부산국제영화제"},
+  {id:"uc24a",ind:"ott",mode:"vod",name:"성인 콘텐츠 (AV) 스트리밍 서비스",
+   sitVod:["콘텐츠 불법 유출 / 녹화 방지가 필요해요","멀티 디바이스 사용과 계정 공유를 차단하고 싶어요","글로벌 수강생에게 서비스를 제공해야 해요"],
+   sitLive:[],sitBoth:[],
+   features:{"보안":["콘텐츠 암호화 (DRM)","녹화 차단","기기 대수 제한","계정 공유 차단","동시 시청 제한","워터마킹"],"스트리밍":["글로벌 CDN","VOD / 다시보기","ABR 자동 화질 전환"],"플레이어":[],"데이터":[]},
+   product:"Kollus DRM / Multi DRM",
+   situation:"AV 배우·콘텐츠 라이선스 계약 기반으로 저작권 보호가 최우선. 개발 전담 인력 없이 안정적 배포와 운영 컨설팅 필요. 글로벌 스트리밍 인프라 필수.",
+   position:"DRM + 워터마킹 + 녹화 차단으로 배우·콘텐츠 저작권을 철저히 보호. 글로벌 CDN으로 국내외 어디서나 안정적 스트리밍",
+   customers:"카브엔터테인먼트, 문화스테이, 리디파인미디어, MIB, 씨투비스, PlayboyTV"},
+
+  /* ── 공연 / 행사 (event) ── */
+  {id:"uc24",ind:"event",mode:"both",name:"공연 중계형 서비스 (유료)",
+   sitVod:["불법 캡처 / 녹화를 원천 차단해야 해요","유료 콘텐츠에 다국어 자막이 필요해요"],
+   sitLive:["공연 / 콘서트를 유료로 온라인 실시간 중계하고 싶어요","유료 라이브 중 불법 녹화 / 캡처를 차단해야 해요"],
+   sitBoth:["라이브 종료 후 VOD 다시보기를 바로 제공해야 해요"],
+   features:{"보안":["콘텐츠 암호화 (DRM)","원타임 URL","녹화 차단","사번 / 회원 인증"],"스트리밍":["저지연 라이브 (LIVE)","VOD / 다시보기"],"플레이어":["다국어 자막"],"데이터":[]},
+   product:"Multi DRM + 원타임 URL",
+   situation:"오프라인 공연 온라인 유료 수익화. VOD 중심·편성 라이브 혼합. 유료 콘텐츠 불법 유출에 매우 민감.",
+   position:"유료 관람객의 화면 캡처를 원천 차단. 오프라인 공연의 가치를 온라인으로 완전히 확장",
+   customers:"티켓링크, 국립극단"},
+  {id:"uc25",ind:"event",mode:"both",name:"MICE / 학술대회 온라인 중계",
+   sitVod:[],
+   sitLive:["학술대회 / 컨퍼런스를 온라인으로 실시간 진행해야 해요","등록 참가자에게만 라이브 시청 접근을 제한해야 해요"],
+   sitBoth:["라이브 종료 후 VOD 다시보기를 바로 제공해야 해요"],
+   features:{"보안":["사번 / 회원 인증"],"스트리밍":["저지연 라이브 (LIVE)","VOD / 다시보기"],"플레이어":["HTML5 표준 플레이어","장애인 학습자용 웹접근성 플레이어","라이브 채팅 / Q&A","퀴즈 / 설문"],"데이터":[]},
+   product:"Kollus LIVE + VOD",
+   situation:"설치 없는 웹 기반 접속 선호. 행사 당일 라이브 + 즉시 VOD 다시보기. 실시간 Q&A 채팅 연동.",
+   position:"설치 없이 링크 클릭으로 즉시 입장. 라이브 채팅 Q&A로 오프라인 현장과 온라인이 하나로",
+   customers:"학회, 이벤트 기획사"},
+  {id:"uc26",ind:"event",mode:"both",name:"종교 예배 / 행사 정기 중계",
+   sitVod:[],
+   sitLive:["종교 예배 / 행사를 정기적으로 실시간 중계해야 해요","주말에도 운영 지원을 받을 수 있어야 해요","글로벌 교인에게 안정적으로 송출해야 해요","라이브 스트림 URL을 외부에서 무단 사용하지 못하게 해야 해요"],
+   sitBoth:["라이브 종료 후 VOD 다시보기를 바로 제공해야 해요"],
+   features:{"보안":["재생 URL 암호화"],"스트리밍":["저지연 라이브 (LIVE)","VOD / 다시보기","글로벌 CDN","24/7 안정 운영"],"플레이어":[],"데이터":[]},
+   product:"Kollus LIVE + VOD (미디어인증)",
+   situation:"코로나19 이후 온라인 예배 일반화. 글로벌 교인 CDN 필요. 특정 시간 집중 트래픽. 주말 운영 지원 필수.",
+   position:"주말 예배도 끊김 없이. 글로벌 교인까지 커버하는 CDN, 주말 운영 지원 체계",
+   customers:"scj교회, 공생(단월드)"},
+];
+
+/* situations 합집합 세팅 */
+UC.forEach(u=>{ u.situations=[...u.sitVod,...u.sitLive,...u.sitBoth]; });
+
+let st={ind:null,col:"blue",sits:[],feats:[]};
+let curTab="vod";
+
+/* 탭별 상황 목록 */
+function getSitsByTab(ind,tab){
+  const s=new Set();
+  UC.filter(u=>u.ind===ind).forEach(u=>{
+    const arr=tab==="vod"?u.sitVod:tab==="live"?u.sitLive:u.sitBoth;
+    arr.forEach(x=>s.add(x));
+  });
+  return [...s];
+}
+
+/* 어떤 탭의 상황인지 판별 */
+function sitTab(sit){
+  if(UC.some(u=>u.ind===st.ind&&u.sitVod.includes(sit))) return "vod";
+  if(UC.some(u=>u.ind===st.ind&&u.sitLive.includes(sit))) return "live";
+  return "both";
+}
+
+function switchTab(tab){
+  curTab=tab;
+  ["vod","live","both"].forEach(t=>{
+    document.getElementById("tab-"+t).classList.toggle("active",t===tab);
+    document.getElementById("panel-"+t).classList.toggle("active",t===tab);
+    document.getElementById("desc-"+t).style.display=t===tab?"block":"none";
+  });
+}
+
+function updateTabCounts(){
+  if(!st.ind) return;
+  ["vod","live","both"].forEach(t=>{
+    document.getElementById("cnt-"+t).textContent=getSitsByTab(st.ind,t).length;
+  });
+}
+
+/* SVG 체크마크 */
+const CHK=`<svg class="sit-chk-inner" viewBox="0 0 10 8"><polyline points="1,4 4,7 9,1" stroke-width="1.8" stroke="#fff" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+
+function selCls(tab){ return tab==="vod"?"sel-vod":tab==="live"?"sel-live":"sel-both"; }
+
+function buildSitItem(sit){
+  const tab=sitTab(sit);
+  const isSel=st.sits.includes(sit);
+  const el=document.createElement("div");
+  el.className="sit-item"+(isSel?" "+selCls(tab):"");
+  el.innerHTML=`<div class="sit-chk">${CHK}</div><span class="sit-text">${sit}</span>`;
+  el.onclick=()=>{
+    const idx=st.sits.indexOf(sit);
+    if(idx>-1){ st.sits.splice(idx,1); el.className="sit-item"; }
+    else { st.sits.push(sit); el.className="sit-item "+selCls(sitTab(sit)); }
+    renderStrip();
+    document.getElementById("next2").disabled=st.sits.length===0;
+  };
+  return el;
+}
+
+function renderStrip(){
+  const el=document.getElementById("sel-strip");
+  if(!st.sits.length){ el.innerHTML='<span class="sel-none">아직 선택한 상황이 없습니다</span>'; return; }
+  let h='<span class="sel-strip-lbl">선택됨</span>';
+  st.sits.forEach(s=>{
+    const t=sitTab(s);
+    const cls=t==="vod"?"sel-pill-vod":t==="live"?"sel-pill-live":"sel-pill-both";
+    const safeS=s.replace(/'/g,"\\'");
+    h+=`<span class="sel-pill ${cls}"><span>${s}</span><span class="pill-rm" onclick="removeSit('${safeS}')">×</span></span>`;
+  });
+  el.innerHTML=h;
+}
+
+function removeSit(sit){
+  const idx=st.sits.indexOf(sit);
+  if(idx>-1) st.sits.splice(idx,1);
+  /* 해당 아이템 DOM 업데이트 */
+  ["vod","live","both"].forEach(t=>{
+    document.querySelectorAll("#list-"+t+" .sit-item").forEach(el=>{
+      if(el.querySelector(".sit-text")?.textContent===sit) el.className="sit-item";
+    });
+  });
+  renderStrip();
+  document.getElementById("next2").disabled=st.sits.length===0;
+}
+
+function candidates(){
+  return UC.filter(u=>{
+    if(u.ind!==st.ind) return false;
+    if(!st.sits.length) return true;
+    return st.sits.some(s=>u.situations.includes(s));
+  });
+}
+
+function availFeats(){
+  const g={};
+  candidates().forEach(u=>{
+    Object.entries(u.features).forEach(([grp,feats])=>{
+      if(!g[grp]) g[grp]=new Set();
+      feats.forEach(f=>{if(f) g[grp].add(f);});
+    });
+  });
+  const out={};
+  ["보안","스트리밍","플레이어","데이터"].forEach(grp=>{
+    if(g[grp]&&g[grp].size>0) out[grp]=[...g[grp]];
+  });
+  return out;
+}
+
+function scoreUC(u){
+  if(u.ind!==st.ind) return -1;
+  if(st.sits.length>0&&!u.situations.some(s=>st.sits.includes(s))) return -1;
+  let s=0;
+  st.sits.forEach(sit=>{if(u.situations.includes(sit)) s+=3;});
+  const allF=Object.values(u.features).flat().filter(Boolean);
+  st.feats.forEach(f=>{if(allF.includes(f)) s+=1;});
+  return s;
+}
+
+function updateProgress(n){
+  for(let i=1;i<=3;i++){
+    const pn=document.getElementById("pn"+i),pl=document.getElementById("pl"+i);
+    const hs=document.getElementById("hs"+i);
+    if(i<n){
+      if(pn){pn.textContent="✓";}
+      if(hs){hs.className="hero-step done";}
+    } else if(i===n){
+      if(pn){pn.textContent=i;}
+      if(hs){hs.className="hero-step active";}
+    } else {
+      if(pn){pn.textContent=i;}
+      if(hs){hs.className="hero-step";}
+    }
+  }
+}
+
+function goStep(n){
+  for(let i=1;i<=3;i++)
+    document.getElementById("step"+i).className=i===n?"step-panel visible":"step-panel";
+  updateProgress(n);
+  updateContextBar(n);
+  if(n===2) renderStep2();
+  if(n===3) renderResults();
+  else document.getElementById("inquiry-section").style.display="none";
+  /* step 2↔3 이동 시에만 해당 패널 상단으로 스크롤 */
+  if(n===2||n===3){
+    const panel=document.getElementById("step"+n);
+    if(panel) panel.scrollIntoView({behavior:"smooth",block:"start"});
+  }
+}
+
+
+function updateContextBar(step){
+  const bar=document.getElementById("ctx-bar");
+  if(!st.ind||step===1){bar.classList.remove("visible");return;}
+  bar.classList.add("visible");
+  // 산업 칩
+  const ind=INDUSTRIES.find(i=>i.id===st.ind);
+  if(!ind) return;
+  const chip=document.getElementById("ctx-chip");
+  if(chip){chip.className="ctx-chip chip sel-"+ind.col; chip.textContent=ind.label;}
+  // 상황 pills (step 3에서만)
+  const sitsDiv=document.getElementById("ctx-sits");
+  const divider=document.getElementById("ctx-sits-divider");
+  if(!sitsDiv) return;
+  sitsDiv.innerHTML="";
+  if(step>=3&&st.sits.length>0){
+    divider.style.display="block";
+    const MAX=3;
+    st.sits.slice(0,MAX).forEach(s=>{
+      const t=sitTab(s);
+      const pill=document.createElement("span");
+      pill.className="ctx-sit-pill t-"+t;
+      pill.textContent=s;
+      sitsDiv.appendChild(pill);
+    });
+    if(st.sits.length>MAX){
+      const more=document.createElement("span");
+      more.className="ctx-more";
+      more.textContent="외 "+(st.sits.length-MAX)+"개";
+      sitsDiv.appendChild(more);
+    }
+  } else {
+    divider.style.display="none";
+  }
+}
+
+function renderStep1(){
+  const grid=document.getElementById("industry-grid");
+  if(!grid) return;
+  grid.innerHTML="";
+  const icons={"edu":"🎓","corp":"🏢","bcast":"📡","comm":"🛒","live":"🔴","ott":"🎬","event":"🎭"};
+  INDUSTRIES.forEach(ind=>{
+    const el=document.createElement("div");
+    el.className="ind-card"+(st.ind===ind.id?" selected":"");
+    el.innerHTML='<span class="ind-card-icon">'+icons[ind.id]+'</span>'
+      +'<span class="ind-card-label">'+ind.label+'</span>'
+      +'<div class="ind-card-check">✓</div>';
+    el.onclick=()=>{
+      st.ind=ind.id; st.col=ind.col; st.sits=[]; st.feats=[];
+      document.querySelectorAll(".ind-card").forEach(e=>e.classList.remove("selected"));
+      el.classList.add("selected");
+      document.getElementById("next1").disabled=false;
+    };
+    grid.appendChild(el);
+  });
+}
+
+function renderStep2(){
+  if(!st.ind) return;
+  ["vod","live","both"].forEach(t=>{
+    const listEl=document.getElementById("list-"+t);
+    if(!listEl) return;
+    listEl.innerHTML="";
+    const sits=getSitsByTab(st.ind,t);
+    if(!sits.length){
+      const d=document.createElement("div"); d.className="sit-empty";
+      d.textContent=t==="vod"?"이 산업에는 VOD 전용 상황이 없습니다":t==="live"?"이 산업에는 LIVE 전용 상황이 없습니다":"이 산업에는 VOD+LIVE 병행 상황이 없습니다";
+      listEl.appendChild(d);
+    } else {
+      sits.forEach(s=>listEl.appendChild(buildSitItem(s)));
+    }
+  });
+  updateTabCounts();
+  renderStrip();
+  document.getElementById("next2").disabled=st.sits.length===0;
+}
+
+
+function modePillHtml(mode){
+  const cls=mode==="vod"?"pill-vod":mode==="live"?"pill-live":"pill-both";
+  const lbl=mode==="vod"?"VOD":mode==="live"?"LIVE":"VOD+LIVE";
+  return `<span class="ac-mode-pill ${cls}">${lbl}</span>`;
+}
+
+function toggleRest(){
+  const el=document.getElementById("result-rest");
+  const btn=document.getElementById("more-btn");
+  if(!el||!btn) return;
+  const isOpen=el.classList.contains("open");
+  el.classList.toggle("open",!isOpen);
+  const cnt=el.querySelectorAll(".ac-card").length;
+  btn.textContent=isOpen?"▾ 그 외 "+cnt+"개 유스케이스 더 보기":"▴ 접기";
+}
+
+function toggleAc(id){
+  const card=document.getElementById("ac-"+id);
+  if(!card) return;
+  const isOpen=card.classList.contains("open");
+  document.querySelectorAll(".ac-card.open").forEach(el=>el.classList.remove("open"));
+  if(!isOpen) card.classList.add("open");
+}
+
+
+function buildInquiryMailto(scored){
+  const indLabel=INDUSTRIES.find(i=>i.id===st.ind)?.label||"";
+  const ucList=scored.map((x,i)=>""+(i+1)+". "+x.u.name).join("\n");
+  const sits=st.sits.length?st.sits.map(s=>"- "+s).join("\n"):"(선택 없음)";
+  const bodyText="안녕하세요, 콜러스 솔루션 파인더를 통해 문의드립니다.\n\n[선택 산업]\n"+indLabel+"\n\n[선택 상황]\n"+sits+"\n\n[매칭된 유스케이스 Top 3]\n"+ucList+"\n\n[문의 내용]\n(여기에 문의 내용을 작성해 주세요)\n\n감사합니다.";
+  const subject=encodeURIComponent("[콜러스 솔루션 문의] "+indLabel);
+  return "mailto:biz@catenoid.net?subject="+subject+"&body="+encodeURIComponent(bodyText);
+}
+
+function renderResults(){
+  const area=document.getElementById("results-area");
+  if(!area) return;
+  const indLabel=INDUSTRIES.find(i=>i.id===st.ind)?.label||"";
+  const scored=UC.map(u=>({u,s:scoreUC(u)})).filter(x=>x.s>=0).sort((a,b)=>b.s-a.s);
+  if(!scored.length){
+    area.innerHTML='<div class="empty">선택한 조건과 일치하는 유스케이스가 없습니다.<br>조건을 조정해 보세요.</div>';
+    return;
+  }
+
+  const top3=scored.slice(0,3);
+  const rest=scored.slice(3);
+  const chevronSvg='<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+  function cardHtml(u,i,isTop){
+    const allF=Object.values(u.features).flat().filter(Boolean);
+    const tgs=allF.map(f=>'<span class="tag">'+f+'</span>').join("")||'<span class="tag">기본 스트리밍</span>';
+    let dp=u.product;
+    if(u.id==="uc18"){const hcs=u.charllaSits&&u.charllaSits.some(s=>st.sits.includes(s));dp=hcs?"찰나(Charlla)":"Kollus Live Commerce";}
+    const mb=isTop?'<span class="ac-match-badge">매칭</span>':"";
+    const cc='ac-card'+(isTop?" top":" rest");
+    const rc='ac-rank'+(isTop?" ac-rank-top":"");
+    return [
+      '<div class="'+cc+'" id="ac-'+u.id+'" data-ucid="'+u.id+'">',
+        '<div class="ac-header" data-toggle="'+u.id+'">',
+          '<div class="ac-left">',
+            '<div class="'+rc+'">'+(i+1)+'</div>',
+            '<span class="ac-name">'+u.name+'</span>',
+            mb,
+          '</div>',
+          '<div class="ac-right">',
+            modePillHtml(u.mode),
+            '<span class="ac-product">'+dp+'</span>',
+            '<span class="ac-chevron">'+chevronSvg+'</span>',
+          '</div>',
+        '</div>',
+        '<div class="ac-body">',
+          '<div class="ac-section"><div class="ac-label">고객 상황</div><div class="ac-text">'+u.situation+'</div></div>',
+          '<div class="ac-divider"></div>',
+          '<div class="ac-section"><div class="ac-label">제공 기능</div><div class="tags">'+tgs+'</div></div>',
+          '<div class="ac-divider"></div>',
+          '<div class="ac-section"><div class="ac-label">콜러스가 제공하는 가치</div><div class="ac-pos">'+u.position+'</div></div>',
+          '<div class="ac-section"><div class="ac-label">주요 고객사</div><div class="ac-customers">'+u.customers+'</div></div>',
+        '</div>',
+      '</div>'
+    ].join("");
+  }
+
+  let html='<div class="result-meta">'+indLabel+' 영역에서 <strong>'+scored.length+'개</strong>의 유스케이스가 매칭되었습니다.</div>';
+  html+='<div class="result-list">';
+  html+='<div class="result-section-label">추천 매칭 Top 3</div>';
+  top3.forEach(({u,s},i)=>{ html+=cardHtml(u,i,true); });
+
+  if(rest.length){
+    html+='<button class="result-more-btn" id="more-btn" onclick="toggleRest()">▾ 그 외 '+rest.length+'개 유스케이스 더 보기</button>';
+    html+='<div class="result-rest" id="result-rest">';
+    rest.forEach(({u,s},i)=>{ html+=cardHtml(u,i+3,false); });
+    html+='</div>';
+  }
+
+  html+='</div>';
+  const indLabel2=INDUSTRIES.find(i=>i.id===st.ind)?.label||"";
+  const sitSummary=st.sits.length?st.sits.map(s=>"- "+s).join("\n"):"(선택 없음)";
+  const prefillMsg="[선택 산업]\n"+indLabel2+"\n\n[선택 상황 / 니즈]\n"+sitSummary;
+
+  area.innerHTML=html;
+  if(scored.length) document.getElementById("ac-"+scored[0].u.id)?.classList.add("open");
+  area.addEventListener("click",function(e){
+    /* ac-body 내부 클릭은 무시 */
+    if(e.target.closest(".ac-body")) return;
+    const hdr=e.target.closest("[data-toggle]");
+    if(hdr) toggleAc(hdr.dataset.toggle);
+  });
+
+  /* 선택 내용 prefill 박스 업데이트 */
+  const prefillEl=document.getElementById("prefill-content");
+  if(prefillEl) prefillEl.textContent=prefillMsg;
+  /* 파이프드라이브 폼 재초기화 */
+  const pdDiv=document.querySelector(".pipedriveWebForms");
+  if(pdDiv && !pdDiv.querySelector("iframe")){
+    const s=document.createElement("script");
+    s.src="https://webforms.pipedrive.com/f/loader";
+    document.body.appendChild(s);
+  }
+  document.getElementById("inquiry-section").style.display="block";
+}
+
+function copyPrefill(){
+  const el=document.getElementById("prefill-content");
+  if(!el) return;
+  navigator.clipboard.writeText(el.innerText).then(()=>{
+    const msg=document.getElementById("prefill-copied");
+    msg.style.display="block";
+    setTimeout(()=>msg.style.display="none",2500);
+  }).catch(()=>{
+    const range=document.createRange();
+    range.selectNode(el);
+    window.getSelection().removeAllRanges();
+    window.getSelection().addRange(range);
+    document.execCommand("copy");
+    window.getSelection().removeAllRanges();
+    const msg=document.getElementById("prefill-copied");
+    msg.style.display="block";
+    setTimeout(()=>msg.style.display="none",2500);
+  });
+}
+
+function clearSits(){
+  st.sits=[]; st.feats=[];
+  curTab="vod"; switchTab("vod");
+  renderStep2();
+  renderStrip();
+  document.getElementById("next2").disabled=true;
+}
+
+function reset(){
+  st={ind:null,col:"blue",sits:[],feats:[]};
+  curTab="vod"; switchTab("vod");
+  document.getElementById("ctx-bar").classList.remove("visible");
+  document.getElementById("inquiry-section").style.display="none";
+  renderStep1(); goStep(1);
+}
+
+// 초기화
+(function(){
+  function init(){
+    var grid=document.getElementById('industry-grid');
+    if(!grid){ setTimeout(init,50); return; }
+    renderStep1();
+    goStep(1);
+  }
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
+</body>
+</html>
