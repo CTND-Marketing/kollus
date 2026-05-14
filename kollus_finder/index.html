@@ -990,11 +990,23 @@ function clearSits() {
   renderS2();
 }
 
+function resetPipedriveForm() {
+  var wrap = document.querySelector('.pd-wrap');
+  if(!wrap) return;
+  var url = 'https://webforms.pipedrive.com/f/1tgdA9o87kotVaCRBf8cDwNi0X9oUUMVHOWcVzKi1KgnqdCbGH0spcWwxsQPufFfB';
+  wrap.innerHTML = '<div class="pipedriveWebForms" data-pd-webforms="'+url+'"></div>';
+  var s = document.createElement('script');
+  s.src = 'https://webforms.pipedrive.com/f/loader';
+  s.onload = function(){};
+  wrap.appendChild(s);
+}
+
 function reset() {
   st={ind:null,sits:[]};
   curTab='vod';
   var inqEl=$('inq'); if(inqEl) inqEl.classList.remove('on');
   var ctx=$('ctx'); if(ctx) ctx.className='ctx';
+  resetPipedriveForm();
   renderS1();
   go(1);
 }
