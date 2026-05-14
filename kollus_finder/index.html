@@ -103,6 +103,11 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--ink)
 /* SEL STRIP */
 .strip{display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:11px 16px;background:var(--white);border:1px solid var(--border);border-radius:var(--r-lg);margin-bottom:2rem;min-height:48px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
 .strip-lbl{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-right:4px;white-space:nowrap}
+.strip-tab-badge{font-size:10.5px;font-weight:800;padding:3px 9px;border-radius:50px;white-space:nowrap;letter-spacing:.5px;text-transform:uppercase}
+.strip-tab-badge.vod{background:#DBEAFE;color:#1D4ED8}
+.strip-tab-badge.live{background:#FEF3C7;color:#B45309}
+.strip-tab-badge.both{background:#D1FAE5;color:#047857}
+.strip-sep{width:1px;height:18px;background:var(--border);flex-shrink:0;align-self:center}
 .spill{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:50px;font-size:12px;font-weight:600}
 .spill.vod{background:#EFF6FF;color:#1E40AF;border:1px solid #BFDBFE}
 .spill.live{background:#FFFBEB;color:#92400E;border:1px solid #FDE68A}
@@ -739,24 +744,46 @@ function updateStrip() {
     el.appendChild(none);
     return;
   }
-  var lbl=document.createElement('span');
-  lbl.className='strip-lbl';
-  lbl.textContent='선택됨';
-  el.appendChild(lbl);
+  // 탭별 그룹화
+  var groups = { vod:[], live:[], both:[] };
   st.sits.forEach(function(s){
-    var t=sitTab(s);
-    var pill=document.createElement('span');
-    pill.className='spill '+t;
-    var txt=document.createElement('span');
-    txt.textContent=s;
-    var x=document.createElement('span');
-    x.className='spill-x';
-    x.textContent='×';
-    (function(sit){ x.onclick=function(){ removeSit(sit); }; })(s);
-    pill.appendChild(txt);
-    pill.appendChild(x);
-    el.appendChild(pill);
+    var t = sitTab(s);
+    if(groups[t]) groups[t].push(s);
   });
+  var tabInfo = {
+    vod:  { label:'VOD',      cls:'vod'  },
+    live: { label:'LIVE',     cls:'live' },
+    both: { label:'VOD+LIVE', cls:'both' }
+  };
+  ['vod','live','both'].forEach(function(t){
+    if(!groups[t].length) return;
+    // 탭 라벨 뱃지
+    var badge = document.createElement('span');
+    badge.className = 'strip-tab-badge ' + t;
+    badge.textContent = tabInfo[t].label;
+    el.appendChild(badge);
+    // 항목 pill들
+    groups[t].forEach(function(s){
+      var pill = document.createElement('span');
+      pill.className = 'spill ' + t;
+      var txt = document.createElement('span');
+      txt.textContent = s;
+      var x = document.createElement('span');
+      x.className = 'spill-x';
+      x.textContent = '×';
+      (function(sit){ x.onclick = function(){ removeSit(sit); }; })(s);
+      pill.appendChild(txt);
+      pill.appendChild(x);
+      el.appendChild(pill);
+    });
+    // 구분선 (마지막 그룹 제외)
+    var sep = document.createElement('span');
+    sep.className = 'strip-sep';
+    el.appendChild(sep);
+  });
+  // 마지막 구분선 제거
+  var lastChild = el.lastChild;
+  if(lastChild && lastChild.className === 'strip-sep') el.removeChild(lastChild);
 }
 
 function removeSit(s) {
@@ -852,8 +879,14 @@ function renderResults() {
   if(scored.length) openAc(scored[0].u.id);
   // 견적 폼
   var ind2 = INDUSTRIES.filter(function(i){ return i.id===st.ind; })[0];
-  var sits = st.sits.length ? st.sits.map(function(s){ return '- '+s; }).join('\n') : '(선택 없음)';
-  var pre = '[선택 산업]\n'+(ind2?ind2.label:'')+' \n\n[선택 상황 / 니즈]\n'+sits;
+  var sitGroups = { vod:[], live:[], both:[] };
+  st.sits.forEach(function(s){ var t=sitTab(s); if(sitGroups[t]) sitGroups[t].push(s); });
+  var sitLines = '';
+  if(sitGroups.vod.length)  sitLines += '[VOD]\n'  + sitGroups.vod.map(function(s){ return '- '+s; }).join('\n') + '\n\n';
+  if(sitGroups.live.length) sitLines += '[LIVE]\n' + sitGroups.live.map(function(s){ return '- '+s; }).join('\n') + '\n\n';
+  if(sitGroups.both.length) sitLines += '[VOD+LIVE]\n' + sitGroups.both.map(function(s){ return '- '+s; }).join('\n') + '\n\n';
+  if(!sitLines) sitLines = '(선택 없음)\n';
+  var pre = '[선택 산업]\n'+(ind2?ind2.label:'')+' \n\n[선택 상황 / 니즈]\n'+sitLines.trim();
   var pe=$('pre-txt'); if(pe) pe.textContent=pre;
   var inqEl=$('inq'); if(inqEl) inqEl.classList.add('on');
 }
