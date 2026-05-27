@@ -121,11 +121,11 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--gray-50);color:var(-
 .step.on{display:block;animation:fadeUp .25s var(--ease)}
 @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 
-.s-tag{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--blue);margin-bottom:.5rem}
-.s-tag-dot{width:5px;height:5px;border-radius:50%;background:var(--blue);flex-shrink:0}
-.s-title{font-size:clamp(1.25rem,2vw,1.5rem);font-weight:800;color:var(--gray-900);letter-spacing:-.025em;margin-bottom:.4rem}
-.s-sub{font-size:14.5px;color:var(--gray-500);margin-bottom:2rem;line-height:1.75}
-.s-sub b{color:var(--blue);font-weight:700}
+.s-tag,.step-tag{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--blue);margin-bottom:.5rem}
+.s-tag-dot,.step-tag-dot{width:5px;height:5px;border-radius:50%;background:var(--blue);flex-shrink:0}
+.s-title,.step-title{font-size:clamp(1.25rem,2vw,1.5rem);font-weight:800;color:var(--gray-900);letter-spacing:-.025em;margin-bottom:.4rem}
+.s-sub,.step-sub{font-size:14.5px;color:var(--gray-500);margin-bottom:2rem;line-height:1.75}
+.s-sub b,.step-sub b{color:var(--blue);font-weight:700}
 
 /* ────────────────────────────────────────────
    CTX BAR
@@ -135,7 +135,7 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--gray-50);color:var(-
 .ctx-back{font-size:12.5px;color:var(--gray-400);cursor:pointer;padding:4px 10px;border-radius:var(--r-sm);border:1px solid transparent;background:none;font-family:inherit;transition:var(--ease)}
 .ctx-back:hover{border-color:var(--gray-200);color:var(--gray-600);background:var(--gray-50)}
 .ctx-sep{width:1px;height:14px;background:var(--gray-200);flex-shrink:0}
-.ctx-lbl{font-size:10.5px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--gray-400)}
+.ctx-lbl,.ctx-label{font-size:10.5px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--gray-400)}
 .ctx-chip{font-size:13px;font-weight:700;padding:3px 12px;background:var(--blue-50);color:var(--blue-d);border:1px solid var(--blue-200);border-radius:var(--r-pill)}
 
 /* ────────────────────────────────────────────
