@@ -235,56 +235,67 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--gray-50);color:var(-
 .r-meta{display:flex;align-items:center;gap:10px;font-size:14px;font-weight:600;color:#1E3A5F;margin-bottom:2rem;padding:14px 20px;background:var(--blue-50);border-radius:var(--r-lg);border:1px solid var(--blue-200)}
 .r-dot{width:7px;height:7px;border-radius:50%;background:var(--blue);flex-shrink:0}
 .r-meta b{color:var(--blue)}
-.r-sec{font-size:11.5px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;color:var(--gray-400);margin-bottom:.875rem;display:flex;align-items:center;gap:10px}
+.r-sec{font-size:11.5px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;color:var(--gray-400);margin-bottom:1.25rem;display:flex;align-items:center;gap:10px}
 .r-sec::after{content:'';flex:1;height:1px;background:var(--gray-200)}
-.r-list{display:flex;flex-direction:column;gap:8px}
-.r-more{display:flex;align-items:center;justify-content:center;gap:7px;width:100%;margin-top:10px;padding:13px;border-radius:var(--r-lg);border:1.5px dashed var(--gray-300);background:var(--white);font-size:13.5px;font-weight:600;color:var(--gray-400);cursor:pointer;font-family:inherit;transition:var(--ease)}
-.r-more:hover{border-color:var(--blue);color:var(--blue);background:var(--blue-50);border-style:solid}
-.r-rest{display:none;flex-direction:column;gap:8px;margin-top:8px}
-.r-rest.on{display:flex}
-
-/* ────────────────────────────────────────────
-   ACCORDION
-──────────────────────────────────────────── */
-.ac{background:var(--white);border:1.5px solid var(--gray-200);border-radius:var(--r-xl);overflow:hidden;transition:var(--ease);box-shadow:var(--sh-xs)}
-.ac:hover{border-color:var(--gray-300);box-shadow:var(--sh-sm)}
-.ac.top{border-color:var(--blue-200)}
-.ac.top:hover{border-color:var(--blue)}
-.ac.open{border-color:var(--blue)!important;box-shadow:0 4px 20px rgba(59,130,246,.1)!important}
-.ac-hd{display:flex;align-items:center;gap:12px;padding:16px 20px;cursor:pointer;transition:background var(--ease)}
-.ac-hd:hover{background:var(--gray-50)}
-.ac.open .ac-hd{background:var(--blue-50)}
-.ac-left{display:flex;align-items:center;gap:11px;flex:1;min-width:0}
-.ac-num{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0;background:var(--gray-100);color:var(--gray-400);border:1.5px solid var(--gray-200)}
-.ac.top .ac-num{background:var(--blue);color:#fff;border-color:var(--blue);width:28px;height:28px}
-.ac.rest .ac-num{width:22px;height:22px;font-size:11px}
-.ac-badge{font-size:10.5px;font-weight:700;padding:2px 9px;border-radius:var(--r-pill);background:var(--blue);color:#fff;white-space:nowrap}
-.ac-name{font-size:15.5px;font-weight:700;color:var(--gray-900);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
-.ac.top .ac-name{font-size:16px;font-weight:800}
-.ac.rest .ac-name{font-size:14px;font-weight:600;color:var(--gray-500)}
-.ac.open .ac-name{color:var(--blue-d)}
-.ac-right{display:flex;align-items:center;gap:7px;flex-shrink:0;flex-wrap:nowrap}
-.ac-pill{font-size:10px;font-weight:700;padding:2px 8px;border-radius:var(--r-pill)}
+/* CARD GRID */
+.rc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:6px}
+.rc{background:var(--white);border:1.5px solid var(--gray-200);border-radius:var(--r-xl);padding:20px;cursor:pointer;transition:var(--ease);box-shadow:var(--sh-xs);display:flex;flex-direction:column;gap:12px;position:relative}
+.rc:hover{border-color:var(--blue-200);box-shadow:var(--sh-md);transform:translateY(-2px)}
+.rc.top{border-color:var(--blue-200)}
+.rc.top:hover{border-color:var(--blue)}
+.rc-rank{position:absolute;top:14px;right:14px;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;background:var(--gray-100);color:var(--gray-400);border:1.5px solid var(--gray-200)}
+.rc.top .rc-rank{background:var(--blue);color:#fff;border-color:var(--blue)}
+.rc-head{display:flex;align-items:center;gap:7px;padding-right:32px;flex-wrap:wrap}
+.rc-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:var(--r-pill);background:var(--blue);color:#fff;white-space:nowrap;flex-shrink:0}
+.rc-pill,.ac-pill{font-size:10px;font-weight:700;padding:2px 8px;border-radius:var(--r-pill)}
 .pv{background:var(--blue-50);color:var(--vod-t);border:1px solid var(--blue-200)}
 .pl{background:#FFFBEB;color:var(--live-t);border:1px solid #FDE68A}
 .pb{background:#F0FDF4;color:var(--both-t);border:1px solid #BBF7D0}
-.ac-prod{font-size:11.5px;color:var(--gray-400);background:var(--gray-50);border:1px solid var(--gray-200);padding:2px 9px;border-radius:var(--r-pill);white-space:nowrap}
-.ac.open .ac-prod{background:var(--blue-50);color:var(--blue);border-color:var(--blue-200)}
-.ac-arr{width:18px;height:18px;background:var(--gray-100);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--gray-400);transition:transform var(--ease);flex-shrink:0}
-.ac.open .ac-arr{transform:rotate(180deg);color:var(--blue);background:var(--blue-100)}
-.ac-bd{display:none;border-top:1px solid var(--gray-100)}
-.ac.open .ac-bd{display:grid;grid-template-columns:1fr 1fr}
-.ac-col{padding:20px 22px}
-.ac-col:first-child{border-right:1px solid var(--gray-100)}
-.ac-full{grid-column:1/-1;padding:16px 22px;border-top:1px solid var(--gray-100)}
-.ac-lbl{font-size:10.5px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--gray-400);margin-bottom:8px;display:flex;align-items:center;gap:6px}
-.ac-lbl::after{content:'';flex:1;height:1px;background:var(--gray-100)}
-.ac-txt{font-size:14px;color:var(--gray-600);line-height:1.8}
-.ac-pos{padding:12px 16px;background:var(--blue-50);border-left:3px solid var(--blue);border-radius:0 var(--r-md) var(--r-md) 0;font-size:14px;color:#1E3A5F;line-height:1.8;font-style:italic;font-weight:600}
-.ac-cust{font-size:13.5px;color:var(--gray-500);line-height:1.75}
-.tags{display:flex;flex-wrap:wrap;gap:5px}
-.tag{font-size:11.5px;padding:3px 10px;border-radius:var(--r-pill);background:var(--gray-50);color:var(--gray-600);border:1px solid var(--gray-200);font-weight:500;transition:var(--ease)}
-.tag:hover{background:var(--blue-50);color:var(--blue);border-color:var(--blue-200)}
+.rc-name{font-size:15px;font-weight:800;color:var(--gray-900);line-height:1.35;word-break:keep-all}
+.rc.top .rc-name{color:var(--blue-d)}
+.rc-rest .rc-name{font-size:14px;font-weight:700;color:var(--gray-700)}
+.rc-prod{font-size:11.5px;color:var(--gray-400);background:var(--gray-50);border:1px solid var(--gray-200);padding:3px 10px;border-radius:var(--r-pill);display:inline-block;align-self:flex-start}
+.rc-tags{display:flex;flex-wrap:wrap;gap:4px}
+.rc-tag{font-size:11px;padding:3px 9px;border-radius:var(--r-pill);background:var(--gray-50);color:var(--gray-500);border:1px solid var(--gray-200);font-weight:500}
+.rc-btn{margin-top:auto;padding:9px 16px;border-radius:var(--r-md);background:var(--blue-50);border:1px solid var(--blue-200);color:var(--blue-d);font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit;transition:var(--ease);text-align:center}
+.rc:hover .rc-btn{background:var(--blue);color:#fff;border-color:var(--blue)}
+.r-more{display:flex;align-items:center;justify-content:center;gap:7px;width:100%;margin-top:6px;padding:13px;border-radius:var(--r-lg);border:1.5px dashed var(--gray-300);background:var(--white);font-size:13.5px;font-weight:600;color:var(--gray-400);cursor:pointer;font-family:inherit;transition:var(--ease)}
+.r-more:hover{border-color:var(--blue);color:var(--blue);background:var(--blue-50);border-style:solid}
+.r-rest{display:none;margin-top:6px}
+.r-rest.on{display:block}
+/* MODAL */
+.mo-overlay{display:none;position:fixed;inset:0;background:rgba(15,23,42,.55);z-index:1000;align-items:center;justify-content:center;padding:24px;backdrop-filter:blur(2px)}
+.mo-overlay.on{display:flex}
+.mo-box{background:var(--white);border-radius:var(--r-2xl);max-width:680px;width:100%;max-height:88vh;overflow-y:auto;box-shadow:0 24px 64px rgba(0,0,0,.18);animation:moIn .22s ease}
+@keyframes moIn{from{opacity:0;transform:translateY(16px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
+.mo-hd{display:flex;align-items:flex-start;gap:12px;padding:24px 24px 20px;border-bottom:1px solid var(--gray-100);position:sticky;top:0;background:var(--white);z-index:1;border-radius:var(--r-2xl) var(--r-2xl) 0 0}
+.mo-hd-left{flex:1;min-width:0}
+.mo-meta{display:flex;align-items:center;gap:7px;margin-bottom:8px;flex-wrap:wrap}
+.mo-rank{width:24px;height:24px;border-radius:50%;background:var(--blue);color:#fff;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.mo-rank.rest{background:var(--gray-200);color:var(--gray-500);border:1.5px solid var(--gray-300)}
+.mo-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:var(--r-pill);background:var(--blue);color:#fff}
+.mo-title{font-size:18px;font-weight:800;color:var(--gray-900);line-height:1.3;letter-spacing:-.02em;word-break:keep-all}
+.mo-prod{font-size:12px;color:var(--blue);background:var(--blue-50);border:1px solid var(--blue-200);padding:3px 11px;border-radius:var(--r-pill);font-weight:700;display:inline-block;margin-top:10px}
+.mo-close{width:32px;height:32px;border-radius:50%;background:var(--gray-100);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--gray-500);flex-shrink:0;transition:var(--ease);margin-top:2px}
+.mo-close:hover{background:var(--gray-200);color:var(--gray-900)}
+.mo-body{padding:24px}
+.mo-section{margin-bottom:22px}
+.mo-section:last-child{margin-bottom:0}
+.mo-lbl{font-size:10.5px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--gray-400);margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.mo-lbl::after{content:'';flex:1;height:1px;background:var(--gray-100)}
+.mo-txt{font-size:14px;color:var(--gray-600);line-height:1.85}
+.mo-pos{padding:14px 18px;background:var(--blue-50);border-left:3px solid var(--blue);border-radius:0 var(--r-md) var(--r-md) 0;font-size:14px;color:#1E3A5F;line-height:1.85;font-style:italic;font-weight:600}
+.mo-cust{font-size:13.5px;color:var(--gray-500);line-height:1.8}
+.mo-feat-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.mo-feat-group{}
+.mo-feat-cat{font-size:10.5px;font-weight:700;color:var(--gray-400);letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px}
+.mo-feat-tags{display:flex;flex-wrap:wrap;gap:4px}
+.mo-feat-tag{font-size:11px;padding:3px 9px;border-radius:var(--r-pill);background:var(--blue-50);color:var(--blue-d);border:1px solid var(--blue-200);font-weight:500}
+.mo-ft{padding:18px 24px;border-top:1px solid var(--gray-100);background:var(--gray-50);border-radius:0 0 var(--r-2xl) var(--r-2xl)}
+.mo-ft-btn{width:100%;padding:12px;border-radius:var(--r-md);background:var(--blue);border:none;color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;transition:var(--ease);box-shadow:var(--sh-blue)}
+.mo-ft-btn:hover{background:var(--blue-d)}
+
+/* ── RESPONSIVE for cards ── */
 
 /* ────────────────────────────────────────────
    NAV
@@ -336,14 +347,9 @@ footer{background:var(--navy);padding:1.75rem 0}
 ──────────────────────────────────────────── */
 @media(max-width:1024px){
   .ind-grid{grid-template-columns:repeat(2,1fr)}
-  .ac.open .ac-bd{grid-template-columns:1fr}
-  .ac-col:first-child{border-right:none;border-bottom:1px solid var(--gray-100)}
+  .rc-grid{grid-template-columns:repeat(2,1fr)}
 }
 @media(max-width:900px){
-  .ac-name{font-size:15px}
-  .ac-hd{padding:14px 16px}
-  .ac-prod{max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-
   .tabs{gap:.5rem}
   .tab{padding:1.125rem .875rem}
   .tab .t-ic{font-size:24px}
@@ -351,6 +357,7 @@ footer{background:var(--navy);padding:1.75rem 0}
   .tab .t-sl{display:none}
   .sit-list{grid-template-columns:1fr}
   .inq-cols{grid-template-columns:1fr}
+  .rc-grid{gap:10px}
 }
 @media(max-width:600px){
   .hero{padding:2.5rem 0}
@@ -368,19 +375,11 @@ footer{background:var(--navy);padding:1.75rem 0}
   .sit-txt{font-size:13.5px}
   .nav{flex-wrap:wrap;gap:7px;margin-top:1.75rem}
   .btn-r{margin-left:0;width:100%;justify-content:center}
-  .ac-hd{padding:13px 16px}
-  .ac-col,.ac-full{padding:14px 16px}
+  .rc-grid,.rc-grid.rest-grid{grid-template-columns:1fr}
+  .mo-feat-grid{grid-template-columns:1fr}
+  .mo-overlay{align-items:flex-end;padding:0}
+  .mo-box{border-radius:var(--r-xl) var(--r-xl) 0 0;max-height:92vh}
   .inq-box{padding:1.25rem}
-
-  .ac-hd{padding:13px 14px;gap:8px}
-  .ac-name{font-size:14.5px;white-space:normal;line-height:1.35}
-  .ac.top .ac-name{font-size:15px}
-  .ac-num{width:22px;height:22px;font-size:11px}
-  .ac.top .ac-num{width:24px;height:24px}
-  .ac-prod{display:none}
-  .ac-badge{font-size:10px;padding:2px 7px}
-  .ac-right{gap:5px}
-  .ac-pill{font-size:9.5px;padding:2px 7px}
 }
 </style>
 </head>
@@ -500,6 +499,27 @@ footer{background:var(--navy);padding:1.75rem 0}
       </div>
     </div>
   </div>
+
+
+<!-- Modal -->
+<div class="mo-overlay" id="mo-overlay" onclick="closeModal(event)">
+  <div class="mo-box" id="mo-box">
+    <div class="mo-hd">
+      <div class="mo-hd-left">
+        <div class="mo-meta" id="mo-meta"></div>
+        <div class="mo-title" id="mo-title"></div>
+        <div class="mo-prod" id="mo-prod"></div>
+      </div>
+      <button class="mo-close" onclick="closeModal(null)">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 1l12 12M13 1L1 13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <div class="mo-body" id="mo-body"></div>
+    <div class="mo-ft">
+      <button class="mo-ft-btn" onclick="closeModal(null);document.getElementById('inq').scrollIntoView({behavior:'smooth'})">📋 이 솔루션으로 견적 문의하기</button>
+    </div>
+  </div>
+</div>
 
 </div>
 
@@ -973,6 +993,35 @@ function pill(mode) {
   return '<span class="ac-pill '+cls+'">'+lbl+'</span>';
 }
 
+function getDisplayProduct(u) {
+  if(u.id==='uc18') {
+    var hcs = u.charllaSits && u.charllaSits.some(function(s){ return st.sits.indexOf(s)>-1; });
+    return hcs ? '찰나(Charlla)' : 'Kollus Live Commerce';
+  }
+  return u.product;
+}
+
+function buildResultCard(u, i, isTop) {
+  var dp = getDisplayProduct(u);
+  var allF = [].concat(u.features['보안']||[]).concat(u.features['스트리밍']||[]).concat(u.features['플레이어']||[]).concat(u.features['데이터']||[]).filter(Boolean);
+  // 카드에는 상위 6개 태그만 표시
+  var topF = allF.slice(0, 6);
+  var tagHtml = topF.map(function(f){ return '<span class="rc-tag">'+f+'</span>'; }).join('');
+  if(allF.length > 6) tagHtml += '<span class="rc-tag" style="color:var(--gray-400)">+' + (allF.length-6) + '</span>';
+  var badge = isTop ? '<span class="rc-badge">추천</span>' : '';
+  var cardCls = 'rc' + (isTop ? ' top' : ' rc-rest');
+  var modePill = '<span class="rc-pill ' + (u.mode==='vod'?'pv':u.mode==='live'?'pl':'pb') + '">'
+    + (u.mode==='vod'?'VOD':u.mode==='live'?'LIVE':'VOD+LIVE') + '</span>';
+  return '<div class="'+cardCls+'" onclick="openModal(\''+u.id+'\')">'
+    + '<div class="rc-rank">'+(i+1)+'</div>'
+    + '<div class="rc-head">' + modePill + badge + '</div>'
+    + '<div class="rc-name">'+u.name+'</div>'
+    + '<div class="rc-prod">'+dp+'</div>'
+    + '<div class="rc-tags">'+tagHtml+'</div>'
+    + '<div class="rc-btn">상세보기 →</div>'
+  + '</div>';
+}
+
 function renderResults() {
   var area = $('results');
   if(!area) return;
@@ -983,27 +1032,29 @@ function renderResults() {
     .filter(function(x){ return x.s >= 0; })
     .sort(function(a,b){ return b.s - a.s; });
   if(!scored.length) {
-    area.innerHTML = '<div style="padding:4rem 2rem;text-align:center;color:var(--muted);border:1.5px dashed var(--border);border-radius:var(--r-xl)">선택한 조건과 일치하는 유스케이스가 없습니다.</div>';
+    area.innerHTML = '<div style="padding:4rem 2rem;text-align:center;color:var(--gray-400);border:1.5px dashed var(--gray-200);border-radius:var(--r-xl);background:var(--white)">선택한 조건과 일치하는 유스케이스가 없습니다.</div>';
+    setInquiry(indObj);
     return;
   }
   var top3 = scored.slice(0, 3);
   var rest = scored.slice(3);
-  var chev = '<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
   var html = '<div class="r-meta"><div class="r-dot"></div>' + indLabel + ' 영역에서 <b>' + scored.length + '개</b>의 유스케이스가 매칭되었습니다.</div>';
-  html += '<div class="r-sec">추천 매칭 Top 3</div><div class="r-list">';
-  top3.forEach(function(x, i){ html += buildCard(x.u, i, true, chev); });
+  html += '<div class="r-sec">추천 매칭 Top ' + Math.min(3, top3.length) + '</div>';
+  html += '<div class="rc-grid">';
+  top3.forEach(function(x, i){ html += buildResultCard(x.u, i, true); });
   html += '</div>';
   if(rest.length) {
     html += '<button class="r-more" id="more-btn" onclick="toggleMore()">▾ 그 외 '+rest.length+'개 유스케이스 더 보기</button>';
-    html += '<div class="r-rest" id="r-rest">';
-    rest.forEach(function(x, i){ html += buildCard(x.u, i+3, false, chev); });
-    html += '</div>';
+    html += '<div class="r-rest" id="r-rest"><div class="rc-grid rest-grid">';
+    rest.forEach(function(x, i){ html += buildResultCard(x.u, i+3, false); });
+    html += '</div></div>';
   }
   area.innerHTML = html;
-  // 첫 카드 열기
-  if(scored.length) openAc(scored[0].u.id);
-  // 견적 폼
-  var ind2 = INDUSTRIES.filter(function(i){ return i.id===st.ind; })[0];
+  setInquiry(indObj);
+}
+
+function setInquiry(ind2) {
+  if(!ind2) { var tmp=INDUSTRIES.filter(function(i){ return i.id===st.ind; })[0]; if(tmp) ind2=tmp; }
   var sitGroups = { vod:[], live:[], both:[] };
   st.sits.forEach(function(s){ var t=sitTab(s); if(sitGroups[t]) sitGroups[t].push(s); });
   var sitLines = '';
@@ -1016,57 +1067,79 @@ function renderResults() {
   var inqEl=$('inq'); if(inqEl) inqEl.classList.add('on');
 }
 
-function buildCard(u, i, isTop, chev) {
-  var dp = u.product;
-  if(u.id==='uc18') {
-    var hcs = u.charllaSits && u.charllaSits.some(function(s){ return st.sits.indexOf(s)>-1; });
-    dp = hcs ? '찰나(Charlla)' : 'Kollus Live Commerce';
-  }
-  var allF = [].concat(u.features['보안']||[]).concat(u.features['스트리밍']||[]).concat(u.features['플레이어']||[]).concat(u.features['데이터']||[]).filter(Boolean);
-  var tags = allF.map(function(f){ return '<span class="tag">'+f+'</span>'; }).join('') || '<span class="tag">기본 스트리밍</span>';
-  var badge = isTop ? '<span class="ac-badge">매칭</span>' : '';
-  var numCls = isTop ? 'ac-num' : 'ac-num';
-  var cardCls = 'ac' + (isTop ? ' top' : ' rest');
-  return '<div class="'+cardCls+'" id="ac-'+u.id+'" data-id="'+u.id+'">'
-    +'<div class="ac-hd" onclick="toggleAc(this)">'
-      +'<div class="ac-left">'
-        +'<div class="'+numCls+'">'+(i+1)+'</div>'
-        +'<span class="ac-name">'+u.name+'</span>'
-        +badge
-      +'</div>'
-      +'<div class="ac-right">'
-        +pill(u.mode)
-        +'<span class="ac-prod">'+dp+'</span>'
-        +'<span class="ac-arr">'+chev+'</span>'
-      +'</div>'
-    +'</div>'
-    +'<div class="ac-bd">'
-      +'<div class="ac-col"><div class="ac-lbl">고객 상황</div><div class="ac-txt">'+u.situation+'</div></div>'
-      +'<div class="ac-col"><div class="ac-lbl">제공 기능</div><div class="tags">'+tags+'</div></div>'
-      +'<div class="ac-full"><div class="ac-lbl">콜러스가 제공하는 가치</div><div class="ac-pos">'+u.position+'</div></div>'
-      +'<div class="ac-full" style="border-top:none;padding-top:0"><div class="ac-lbl">주요 고객사</div><div class="ac-cust">'+u.customers+'</div></div>'
-    +'</div>'
-  +'</div>';
+function openModal(ucId) {
+  var u = UC.filter(function(x){ return x.id===ucId; })[0];
+  if(!u) return;
+  var dp = getDisplayProduct(u);
+  // 순위 계산
+  var scored = UC.map(function(x){ return {u:x, s:scoreUC(x)}; })
+    .filter(function(x){ return x.s >= 0; })
+    .sort(function(a,b){ return b.s - a.s; });
+  var rank = scored.findIndex(function(x){ return x.u.id===ucId; }) + 1;
+  var isTop = rank <= 3;
+  var modePill = '<span class="rc-pill ' + (u.mode==='vod'?'pv':u.mode==='live'?'pl':'pb') + '" style="font-size:11px;padding:3px 10px">'
+    + (u.mode==='vod'?'VOD':u.mode==='live'?'LIVE':'VOD+LIVE') + '</span>';
+  // 헤더
+  var metaHtml = '<span class="mo-rank' + (isTop?'':' rest') + '">' + rank + '</span>'
+    + modePill
+    + (isTop ? '<span class="mo-badge">추천</span>' : '');
+  $('mo-meta').innerHTML = metaHtml;
+  $('mo-title').textContent = u.name;
+  $('mo-prod').textContent = dp;
+  // 본문
+  var featCats = ['보안','스트리밍','플레이어','데이터'];
+  var featHtml = '<div class="mo-feat-grid">';
+  featCats.forEach(function(cat){
+    var items = u.features[cat] || [];
+    if(!items.length) return;
+    featHtml += '<div class="mo-feat-group">'
+      + '<div class="mo-feat-cat">' + cat + '</div>'
+      + '<div class="mo-feat-tags">'
+      + items.map(function(f){ return '<span class="mo-feat-tag">'+f+'</span>'; }).join('')
+      + '</div></div>';
+  });
+  featHtml += '</div>';
+  $('mo-body').innerHTML =
+    '<div class="mo-section">'
+    + '<div class="mo-lbl">고객 상황</div>'
+    + '<div class="mo-txt">' + u.situation + '</div>'
+    + '</div>'
+    + '<div class="mo-section">'
+    + '<div class="mo-lbl">콜러스가 제공하는 가치</div>'
+    + '<div class="mo-pos">' + u.position + '</div>'
+    + '</div>'
+    + '<div class="mo-section">'
+    + '<div class="mo-lbl">제공 기능</div>'
+    + featHtml
+    + '</div>'
+    + '<div class="mo-section">'
+    + '<div class="mo-lbl">주요 고객사</div>'
+    + '<div class="mo-cust">' + u.customers + '</div>'
+    + '</div>';
+  var ov = $('mo-overlay');
+  ov.classList.add('on');
+  document.body.style.overflow = 'hidden';
 }
 
-function toggleAc(hd) {
-  var card = hd.parentElement;
-  var isOpen = card.classList.contains('open');
-  document.querySelectorAll('.ac.open').forEach(function(el){ el.classList.remove('open'); });
-  if(!isOpen) card.classList.add('open');
+function closeModal(e) {
+  if(e && e.target !== $('mo-overlay')) return;
+  var ov = $('mo-overlay');
+  ov.classList.remove('on');
+  document.body.style.overflow = '';
 }
 
-function openAc(id) {
-  var el = $('ac-'+id);
-  if(el) el.classList.add('open');
-}
+// ESC key to close modal
+document.addEventListener('keydown', function(e){
+  if(e.key==='Escape') closeModal(null);
+});
 
 function toggleMore() {
   var el=$('r-rest'), btn=$('more-btn');
   if(!el||!btn) return;
   var isOpen = el.classList.contains('on');
   el.classList.toggle('on', !isOpen);
-  var n = el.querySelectorAll('.ac').length;
+  var inner = el.querySelector('.rc-grid');
+  var n = inner ? inner.querySelectorAll('.rc').length : 0;
   btn.textContent = isOpen ? '▾ 그 외 '+n+'개 유스케이스 더 보기' : '▴ 접기';
 }
 
