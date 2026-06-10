@@ -256,7 +256,8 @@ function renderResults() {
   }
   var top3 = scored.slice(0, 3);
   var rest = scored.slice(3);
-  var html = '<div class="r-meta"><div class="r-dot"></div>' + indLabel + ' 영역에서 <b>' + scored.length + '개</b>의 유스케이스가 매칭되었습니다.</div>';
+  var html = '<div class="result-headline">담당자님을 위한 동영상 솔루션 매칭 결과가 나왔어요!</div>';
+  html += '<div class="r-meta"><div class="r-dot"></div>' + indLabel + ' 영역에서 <b>' + scored.length + '개</b>의 유스케이스가 매칭되었습니다.</div>';
   html += '<div class="r-sec">추천 매칭 Top ' + Math.min(3, top3.length) + '</div>';
   html += '<div class="rc-grid">';
   top3.forEach(function(x, i){ html += buildResultCard(x.u, i, true); });
