@@ -1,7 +1,7 @@
 // ── Gemini API ─────────────────────────────────────────────
 var GEMINI_KEYS = [
-  'AQ.Ab8RN6Kdss8lpR8hyTRsZImOh4QNny4qQLsCp1t9G9izafpx6w',
-  'AQ.Ab8RN6LoFIltI-B6CULBXVb1S86sNOd1Sh8UAUioOHcnOCwxcg'
+  'AQ.Ab8RN6JJNpr4KTgoJWANqUlpZvDxD353LGOJRN6HMWPoIrH55w',
+  'AQ.Ab8RN6L0PvpPhK0pbWEXF1QNsvjCht4K1BlMMrgTEK9et52XmQ'
 ];
 
 function buildPrompt(industry, sits) {
