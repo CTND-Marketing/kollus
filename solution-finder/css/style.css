@@ -402,3 +402,8 @@ footer{background:var(--navy);padding:1.75rem 0}
 
   .inq-box{padding:1.25rem}
 }
+/* ── AI 요약 박스 ── */
+.ai-summary-box{background:#EFF6FF;border:1px solid #BFDBFE;border-radius:var(--r-2xl);padding:1.5rem;margin-bottom:2rem}
+.ai-headline{font-size:14px;font-weight:700;color:#1D4ED8;margin-bottom:1rem}
+.ai-spinner{width:16px;height:16px;border:2px solid #BFDBFE;border-top-color:#3B82F6;border-radius:50%;animation:aiSpin .8s linear infinite;flex-shrink:0;display:inline-block}
+@keyframes aiSpin{to{transform:rotate(360deg)}}
