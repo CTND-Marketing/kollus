@@ -402,5 +402,3 @@ footer{background:var(--navy);padding:1.75rem 0}
 
   .inq-box{padding:1.25rem}
 }
-/* ── 결과 헤드라인 ── */
-.result-headline{font-size:14px;font-weight:700;color:#1D4ED8;padding:14px 22px;background:var(--blue-50);border-radius:var(--r-lg);border:1px solid var(--blue-200);margin-bottom:12px}
