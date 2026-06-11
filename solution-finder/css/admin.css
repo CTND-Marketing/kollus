@@ -1,0 +1,138 @@
+/* ═══════════════════════════════════════════════════════════
+   솔루션 파인더 Admin — 전용 스타일
+   ═══════════════════════════════════════════════════════════ */
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --blue:#2563EB;--blue-light:#EFF6FF;--blue-border:#BFDBFE;
+  --green:#16A34A;--red:#DC2626;
+  --gray-50:#F9FAFB;--gray-100:#F3F4F6;--gray-200:#E5E7EB;
+  --gray-400:#9CA3AF;--gray-600:#4B5563;--gray-800:#1F2937;
+  --sidebar:#1B2130;--bg:#F4F6FA;--radius:10px;
+  --shadow:0 1px 3px rgba(0,0,0,.08);
+  --font:'Noto Sans KR',sans-serif;
+  /* 솔루션 파인더 실제 미리보기 스타일 */
+  --sf-blue:#3B82F6;--sf-blue-d:#2563EB;
+  --sf-gray:#64748B;--sf-dark:#0F172A;
+}
+body{font-family:var(--font);background:var(--bg);color:var(--gray-800);min-height:100vh;display:flex;flex-direction:column}
+
+/* ── 로그인 ── */
+#login-screen{display:flex;align-items:center;justify-content:center;min-height:100vh}
+.login-card{background:#fff;border-radius:16px;padding:48px 40px;width:360px;box-shadow:0 4px 24px rgba(0,0,0,.1);text-align:center}
+.login-icon{font-size:40px;margin-bottom:12px}
+.login-card h1{font-size:20px;font-weight:700;color:var(--blue);letter-spacing:.05em;margin-bottom:4px}
+.login-card p{font-size:13px;color:var(--gray-400);margin-bottom:28px}
+.login-card input{width:100%;padding:11px 14px;border:1.5px solid var(--gray-200);border-radius:8px;font-size:14px;font-family:var(--font);margin-bottom:10px;outline:none;transition:border .15s}
+.login-card input:focus{border-color:var(--blue)}
+.login-btn{width:100%;padding:12px;background:var(--blue);color:#fff;border:none;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer;font-family:var(--font);margin-top:4px}
+.login-btn:hover{background:#1D4ED8}
+.login-error{font-size:12px;color:var(--red);margin-top:8px;display:none}
+
+/* ── 앱 레이아웃 ── */
+#app{display:none;flex-direction:column;flex:1}
+.header{background:var(--sidebar);color:#fff;height:56px;display:flex;align-items:center;padding:0 24px;gap:16px;position:sticky;top:0;z-index:100}
+.header-logo{font-size:13px;font-weight:700;letter-spacing:.08em;color:#93C5FD}
+.header-title{font-size:15px;font-weight:600;flex:1}
+.header-user{font-size:12px;color:#94A3B8}
+.btn-logout{background:none;border:1px solid #475569;color:#94A3B8;padding:5px 12px;border-radius:6px;font-size:12px;cursor:pointer;font-family:var(--font)}
+.btn-logout:hover{background:#334155;color:#fff}
+
+/* ── 탭 ── */
+.tab-nav{background:#fff;border-bottom:1px solid var(--gray-200);display:flex;padding:0 24px}
+.tab-btn{padding:14px 20px;font-size:14px;font-weight:500;color:var(--gray-600);border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;font-family:var(--font);transition:all .15s}
+.tab-btn.active{color:var(--blue);border-bottom-color:var(--blue);font-weight:600}
+.tab-btn:hover:not(.active){color:var(--blue)}
+
+/* ── 메인 ── */
+.main{flex:1;padding:28px 24px;max-width:1200px;width:100%;margin:0 auto}
+.section-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.section-hd h2{font-size:18px;font-weight:700}
+.section-hd p{font-size:13px;color:var(--gray-400);margin-top:2px}
+
+/* ── 버튼 ── */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;font-family:var(--font);transition:all .15s}
+.btn-primary{background:var(--blue);color:#fff}.btn-primary:hover{background:#1D4ED8}
+.btn-success{background:var(--green);color:#fff}.btn-success:hover{background:#15803D}
+.btn-danger{background:#FEE2E2;color:var(--red);border:1px solid #FECACA}.btn-danger:hover{background:#FECACA}
+.btn-ghost{background:var(--gray-100);color:var(--gray-600);border:1px solid var(--gray-200)}.btn-ghost:hover{background:var(--gray-200)}
+.btn-sm{padding:5px 10px;font-size:12px}
+.btn-deploy{background:#fff;color:var(--blue);font-weight:700;padding:10px 20px;border-radius:8px;border:none;cursor:pointer;font-family:var(--font);font-size:14px}.btn-deploy:hover{background:#EFF6FF}.btn-deploy:disabled{opacity:.5;cursor:not-allowed}
+
+/* ── 카드 ── */
+.card{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;margin-bottom:16px}
+.card-hd{padding:16px 20px;border-bottom:1px solid var(--gray-100);display:flex;align-items:center;justify-content:space-between}
+.card-hd-title{font-size:14px;font-weight:600}
+.card-body{padding:20px}
+
+/* ── 테이블 ── */
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{background:var(--gray-50);padding:10px 14px;text-align:left;font-weight:600;color:var(--gray-600);border-bottom:1px solid var(--gray-200)}
+td{padding:10px 14px;border-bottom:1px solid var(--gray-100);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--gray-50)}
+
+/* ── 배지 ── */
+.badge{display:inline-block;padding:2px 8px;border-radius:99px;font-size:11px;font-weight:600}
+.badge-vod{background:#EFF6FF;color:#1D4ED8}
+.badge-live{background:#F0FDF4;color:#15803D}
+.badge-both{background:#FFF7ED;color:#C2410C}
+
+/* ── 텍스트 탭 레이블 ── */
+.text-card-label{font-size:11px;font-weight:700;color:var(--gray-400);letter-spacing:.06em;text-transform:uppercase}
+
+/* ── 배포 배너 ── */
+.deploy-banner{background:linear-gradient(135deg,#1B2130,#2563EB);border-radius:var(--radius);padding:24px 28px;color:#fff;display:none;align-items:center;justify-content:space-between;margin-bottom:24px}
+.deploy-banner h3{font-size:16px;font-weight:700;margin-bottom:4px}
+.deploy-banner p{font-size:13px;color:#93C5FD}
+
+/* ── 모달 ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;z-index:200;padding:20px}
+.modal-overlay.open{display:flex}
+.modal{background:#fff;border-radius:16px;width:100%;max-width:620px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.2)}
+.modal-hd{padding:20px 24px;border-bottom:1px solid var(--gray-200);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:#fff;z-index:1}
+.modal-hd h3{font-size:16px;font-weight:700}
+.modal-close{background:none;border:none;font-size:20px;cursor:pointer;color:var(--gray-400)}
+.modal-body{padding:24px}
+.modal-ft{padding:16px 24px;border-top:1px solid var(--gray-200);display:flex;justify-content:flex-end;gap:8px}
+
+/* ── 폼 ── */
+.form-row{margin-bottom:16px}
+.form-row label{display:block;font-size:13px;font-weight:600;color:var(--gray-600);margin-bottom:6px}
+.form-row input,.form-row select,.form-row textarea{width:100%;padding:9px 12px;border:1.5px solid var(--gray-200);border-radius:8px;font-size:14px;font-family:var(--font);outline:none;transition:border .15s}
+.form-row input:focus,.form-row select:focus,.form-row textarea:focus{border-color:var(--blue)}
+.form-row textarea{resize:vertical;min-height:80px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.form-hint{font-size:11px;color:var(--gray-400);margin-top:4px}
+
+/* ── 설정 탭 ── */
+.setting-row{display:flex;align-items:center;gap:12px;padding:14px 0;border-bottom:1px solid var(--gray-100)}
+.setting-row:last-child{border:none}
+.setting-label{font-size:13px;font-weight:600;width:160px;flex-shrink:0}
+.setting-row input{flex:1;padding:8px 12px;border:1.5px solid var(--gray-200);border-radius:8px;font-size:13px;font-family:var(--font);outline:none}
+.setting-row input:focus{border-color:var(--blue)}
+
+/* ── Quill 에디터 커스텀 ── */
+.ql-editor{min-height:90px;font-family:var(--font);font-size:14px;line-height:1.7}
+.ql-toolbar.ql-snow{border-radius:8px 8px 0 0;border-color:var(--gray-200);background:var(--gray-50);padding:6px 8px}
+.ql-container.ql-snow{border-radius:0 0 8px 8px;border-color:var(--gray-200);font-family:var(--font)}
+
+/* ── 실제 화면 미리보기 ── */
+.pv-box{background:#F8FAFC;border:1.5px dashed #CBD5E1;border-radius:8px;padding:14px 16px;min-height:80px}
+.pv-h1{font-size:1.55rem;font-weight:800;color:var(--sf-dark);line-height:1.2;letter-spacing:-.04em}
+.pv-h1 em,.pv-h1 i{font-style:normal;color:var(--sf-blue)}
+.pv-desc{font-size:14px;color:var(--sf-gray);line-height:1.8}
+.pv-desc b,.pv-desc strong{color:var(--sf-blue-d);font-weight:700}
+.pv-title{font-size:1.35rem;font-weight:800;color:var(--sf-dark);letter-spacing:-.04em;line-height:1.25}
+.pv-sub{font-size:14px;color:var(--sf-gray);line-height:1.8}
+.pv-sub b,.pv-sub strong{color:var(--sf-blue);font-weight:700}
+.pv-inq{font-size:20px;font-weight:800;color:var(--sf-dark);letter-spacing:-.03em;line-height:1.35;word-break:keep-all}
+.pv-empty{color:#CBD5E1;font-size:13px}
+
+/* ── 배포 로그 ── */
+#deploy-log{margin-top:16px;font-size:12px;color:var(--gray-600);font-family:monospace;background:var(--gray-50);padding:12px;border-radius:8px;display:none;white-space:pre-wrap;line-height:1.8}
+
+/* ── 토스트 ── */
+.toast{position:fixed;bottom:28px;right:28px;background:#1B2130;color:#fff;padding:12px 20px;border-radius:10px;font-size:13px;font-weight:500;z-index:999;transform:translateY(80px);opacity:0;transition:all .3s;pointer-events:none}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.success{background:var(--green)}
+.toast.error{background:var(--red)}

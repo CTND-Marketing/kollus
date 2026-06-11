@@ -1,17 +1,12 @@
-// ── 텍스트 (Admin에서 관리) ────────────────────────────────
-var SF_TEXTS = {
-  "heroTitle": "우리 비즈니스에 꼭 맞는<br><em>동영상 솔루션</em>,<br>지금 찾아보세요",
-  "heroDesc": "산업·운영 방식·상황을 선택하면,<br><b>콜러스를 도입한 기업들의 유스케이스와 솔루션</b>을 바로 확인할 수 있습니다.",
-  "step1Title": "어떤 산업에서 서비스를 운영하고 계신가요?",
-  "step1Sub": "산업을 선택하면 해당 분야에 맞는 상황이 <b>자동으로 필터링</b>됩니다.",
-  "step2Title": "현재 어떤 상황이나 니즈가 있으신가요?",
-  "step2Sub": "운영 방식 탭을 먼저 선택하고, 상황을 골라주세요. <b>복수 선택 가능</b>합니다.",
-  "step3Title": "선택하신 조건에 맞는 솔루션입니다",
-  "step3Sub": "카드를 클릭하면 자세한 내용과 주요 기능을 확인할 수 있습니다.",
-  "inqTitle": "관심 있는 솔루션을 발견하셨나요?<br>견적과 도입 상담을 신청해 보세요."
-};
+// ═══════════════════════════════════════════════════════════
+//  솔루션 파인더 Admin — 전용 JS
+// ═══════════════════════════════════════════════════════════
 
-const INDUSTRIES=[
+// ── 상수 ─────────────────────────────────────────────────
+var CFG_KEY='sf_admin_cfg', DATA_KEY='sf_admin_data', CHANGED_KEY='sf_changed';
+
+// 인라인 초기 데이터 (data.js 기준)
+var INLINE_INDUSTRIES = [
   {id:"edu",   label:"온라인 교육",             col:"blue"},
   {id:"corp",  label:"기업 · 공공 교육",         col:"green"},
   {id:"bcast", label:"기업 방송 · 커뮤니케이션",  col:"amber"},
@@ -20,8 +15,7 @@ const INDUSTRIES=[
   {id:"ott",   label:"OTT 서비스",               col:"purple"},
   {id:"event", label:"공연 · 행사",              col:"coral"},
 ];
-
-const UC=[
+var INLINE_UC = [
   /* ── 온라인 교육 (edu) ── */
   {id:"uc01",ind:"edu",mode:"both",name:"입시·어학 이러닝 스트리밍 서비스",
    sitVod:[{cat:"보안",txt:"콘텐츠 불법 유출 / 녹화 방지가 필요해요"},{cat:"데이터/개발",txt:"강사 정산을 위한 정확한 진도율 데이터가 필요해요"},{cat:"플레이어",txt:"AI 자막으로 운영 리소스를 줄이고 싶어요"}],
@@ -269,8 +263,411 @@ const UC=[
    position:"주말 예배도 끊김 없이. 글로벌 교인까지 커버하는 CDN, 주말 운영 지원 체계",
    customers:"scj교회, 공생(단월드)"},
 ];
+var DEFAULT_TEXTS = {
+  "heroTitle": "우리 비즈니스에 꼭 맞는<br><em>동영상 솔루션</em>,<br>지금 찾아보세요",
+  "heroDesc": "산업·운영 방식·상황을 선택하면,<br><b>콜러스를 도입한 기업들의 유스케이스와 솔루션</b>을 바로 확인할 수 있습니다.",
+  "step1Title": "어떤 산업에서 서비스를 운영하고 계신가요?",
+  "step1Sub": "산업을 선택하면 해당 분야에 맞는 상황이 <b>자동으로 필터링</b>됩니다.",
+  "step2Title": "현재 어떤 상황이나 니즈가 있으신가요?",
+  "step2Sub": "운영 방식 탭을 먼저 선택하고, 상황을 골라주세요. <b>복수 선택 가능</b>합니다.",
+  "step3Title": "선택하신 조건에 맞는 솔루션입니다",
+  "step3Sub": "카드를 클릭하면 자세한 내용과 주요 기능을 확인할 수 있습니다.",
+  "inqTitle": "관심 있는 솔루션을 발견하셨나요?<br>견적과 도입 상담을 신청해 보세요."
+};
 
-// ── 상태 ──────────────────────────────────────────────────
-var st = { ind: null, sits: [] };
-var curTab = 'vod';
-var IND_ICONS = { edu:'🎓', corp:'🏢', bcast:'📡', comm:'🛒', live:'🔴', ott:'🎬', event:'🎭' };
+var TEXT_FIELDS = [
+  {key:'heroTitle',  label:'히어로 타이틀',    step:'Hero',   cls:'pv-h1'},
+  {key:'heroDesc',   label:'히어로 설명',       step:'Hero',   cls:'pv-desc'},
+  {key:'step1Title', label:'Step 1 타이틀',     step:'Step 1', cls:'pv-title'},
+  {key:'step1Sub',   label:'Step 1 서브타이틀', step:'Step 1', cls:'pv-sub'},
+  {key:'step2Title', label:'Step 2 타이틀',     step:'Step 2', cls:'pv-title'},
+  {key:'step2Sub',   label:'Step 2 서브타이틀', step:'Step 2', cls:'pv-sub'},
+  {key:'step3Title', label:'Step 3 타이틀',     step:'Step 3', cls:'pv-title'},
+  {key:'step3Sub',   label:'Step 3 서브타이틀', step:'Step 3', cls:'pv-sub'},
+  {key:'inqTitle',   label:'문의 섹션 타이틀',  step:'문의',   cls:'pv-inq'}
+];
+
+// ── 설정 ─────────────────────────────────────────────────
+function loadCfg(){
+  var d={token:'',repo:'CTND-Marketing/kollus',path:'kollus/solution-finder/js/data.js',branch:'main',adminId:'admin',adminPw:'admin1234'};
+  try{return Object.assign(d,JSON.parse(localStorage.getItem(CFG_KEY)||'{}'));}catch(e){return d;}
+}
+function saveCfg(c){localStorage.setItem(CFG_KEY,JSON.stringify(c));}
+
+// ── 작업 데이터 ───────────────────────────────────────────
+var WD={industries:null,uc:null,texts:null};
+
+function initWD(){
+  var saved=null;
+  try{saved=JSON.parse(localStorage.getItem(DATA_KEY)||'null');}catch(e){}
+  if(saved){
+    WD.industries=saved.industries;
+    WD.uc=saved.uc;
+    WD.texts=saved.texts;
+  }else{
+    WD.industries=JSON.parse(JSON.stringify(INLINE_INDUSTRIES));
+    WD.uc=JSON.parse(JSON.stringify(INLINE_UC));
+    WD.texts=Object.assign({},DEFAULT_TEXTS);
+  }
+}
+
+function persistWD(){
+  localStorage.setItem(DATA_KEY,JSON.stringify({industries:WD.industries,uc:WD.uc,texts:WD.texts}));
+  localStorage.setItem(CHANGED_KEY,'1');
+  document.getElementById('deploy-banner').style.display='flex';
+}
+
+// ── 로그인 ────────────────────────────────────────────────
+function doLogin(){
+  var cfg=loadCfg();
+  var id=document.getElementById('login-id').value.trim();
+  var pw=document.getElementById('login-pw').value;
+  if(id===cfg.adminId&&pw===cfg.adminPw){
+    localStorage.setItem('sf_logged_in',id);
+    showApp(id);
+  }else{
+    document.getElementById('login-error').style.display='block';
+  }
+}
+
+function showApp(id){
+  document.getElementById('login-screen').style.display='none';
+  document.getElementById('app').style.display='flex';
+  document.getElementById('header-user').textContent=id;
+  initWD();
+  loadSettingsForm();
+  renderTexts();
+  renderIndTable();
+  renderUcFilter();
+  renderUcTable();
+  if(localStorage.getItem(CHANGED_KEY)){
+    document.getElementById('deploy-banner').style.display='flex';
+  }
+}
+
+function doLogout(){
+  localStorage.removeItem('sf_logged_in');
+  document.getElementById('login-screen').style.display='flex';
+  document.getElementById('app').style.display='none';
+}
+
+// ── 탭 ───────────────────────────────────────────────────
+var TABS=['text','industry','uc','deploy','settings'];
+function showTab(name){
+  TABS.forEach(function(t){
+    document.getElementById('pane-'+t).style.display=t===name?'block':'none';
+    document.getElementById('tab-'+t).classList.toggle('active',t===name);
+  });
+}
+
+// ── 텍스트 탭 (Quill) ────────────────────────────────────
+var quillEditors={};
+
+function renderTexts(){
+  var steps={};
+  TEXT_FIELDS.forEach(function(f){
+    if(!steps[f.step])steps[f.step]=[];
+    steps[f.step].push(f);
+  });
+  var html='';
+  Object.keys(steps).forEach(function(step){
+    html+='<div class="card" style="margin-bottom:20px">';
+    html+='<div class="card-hd"><span class="card-hd-title">'+step+'</span></div>';
+    html+='<div class="card-body">';
+    steps[step].forEach(function(f){
+      html+='<div style="margin-bottom:28px">';
+      html+='<div class="text-card-label" style="margin-bottom:8px">'+f.label+'</div>';
+      html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start">';
+      html+='<div><div style="font-size:11px;color:#94A3B8;margin-bottom:4px">✏️ 편집</div>';
+      html+='<div id="quill-'+f.key+'"></div></div>';
+      html+='<div><div style="font-size:11px;color:#94A3B8;margin-bottom:4px">👁 실제 화면 미리보기</div>';
+      html+='<div class="pv-box"><div class="'+(f.cls||'pv-sub')+'" id="pv-'+f.key+'"></div></div></div>';
+      html+='</div></div>';
+    });
+    html+='</div></div>';
+  });
+  document.getElementById('text-panes').innerHTML=html;
+
+  quillEditors={};
+  var toolbar=[['bold','italic','underline'],[{'color':[]},{'background':[]}],[{'size':['small',false,'large','huge']}],['link','clean']];
+  TEXT_FIELDS.forEach(function(f){
+    if(!document.getElementById('quill-'+f.key))return;
+    var q=new Quill('#quill-'+f.key,{theme:'snow',modules:{toolbar:toolbar},placeholder:'내용을 입력하세요...'});
+    q.root.innerHTML=WD.texts[f.key]||'';
+    function updatePv(){
+      var pv=document.getElementById('pv-'+f.key);
+      if(!pv)return;
+      var c=q.root.innerHTML;
+      pv.innerHTML=(!c||c==='<p><br></p>')?'<span class="pv-empty">내용을 입력하면 표시됩니다</span>':c;
+    }
+    updatePv();
+    q.on('text-change',updatePv);
+    quillEditors[f.key]=q;
+  });
+}
+
+function saveTexts(){
+  TEXT_FIELDS.forEach(function(f){
+    var q=quillEditors[f.key];
+    if(q){
+      var h=q.root.innerHTML;
+      WD.texts[f.key]=(h==='<p><br></p>')?'':h;
+    }
+  });
+  persistWD();
+  toast('텍스트 저장 완료','success');
+}
+
+// ── 산업 탭 ──────────────────────────────────────────────
+var COLORS={blue:'#2563EB',green:'#16A34A',amber:'#D97706',pink:'#DB2777',teal:'#0D9488',purple:'#7C3AED',coral:'#EA580C'};
+
+function renderIndTable(){
+  var tb=document.getElementById('ind-tbody');
+  tb.innerHTML=WD.industries.map(function(ind,i){
+    var cnt=WD.uc.filter(function(u){return u.ind===ind.id;}).length;
+    var col=COLORS[ind.col]||'#888';
+    return '<tr>'+
+      '<td><button class="btn btn-ghost btn-sm" onclick="moveInd('+i+',-1)" '+(i===0?'disabled':'')+'>↑</button> '+
+      '<button class="btn btn-ghost btn-sm" onclick="moveInd('+i+',1)" '+(i===WD.industries.length-1?'disabled':'')+'>↓</button></td>'+
+      '<td><code style="font-size:12px;background:#F3F4F6;padding:2px 6px;border-radius:4px">'+ind.id+'</code></td>'+
+      '<td>'+ind.label+'</td>'+
+      '<td><span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:'+col+';vertical-align:middle;margin-right:6px"></span>'+ind.col+'</td>'+
+      '<td>'+cnt+'개</td>'+
+      '<td><button class="btn btn-ghost btn-sm" onclick="editInd('+i+')">수정</button> '+
+      '<button class="btn btn-danger btn-sm" onclick="deleteInd('+i+')">삭제</button></td>'+
+    '</tr>';
+  }).join('');
+}
+
+function moveInd(i,dir){
+  var j=i+dir;
+  if(j<0||j>=WD.industries.length)return;
+  var tmp=WD.industries[i];WD.industries[i]=WD.industries[j];WD.industries[j]=tmp;
+  persistWD();renderIndTable();
+}
+
+var editingIndIdx=-1;
+function openIndModal(idx){
+  editingIndIdx=idx!==undefined?idx:-1;
+  document.getElementById('modal-ind-title').textContent=editingIndIdx>=0?'산업 수정':'산업 추가';
+  if(editingIndIdx>=0){
+    var ind=WD.industries[editingIndIdx];
+    document.getElementById('ind-id').value=ind.id;
+    document.getElementById('ind-id').disabled=true;
+    document.getElementById('ind-label').value=ind.label;
+    document.getElementById('ind-col').value=ind.col;
+  }else{
+    document.getElementById('ind-id').value='';
+    document.getElementById('ind-id').disabled=false;
+    document.getElementById('ind-label').value='';
+    document.getElementById('ind-col').value='blue';
+  }
+  openModal('modal-ind');
+}
+function editInd(i){openIndModal(i);}
+
+function saveInd(){
+  var id=document.getElementById('ind-id').value.trim();
+  var label=document.getElementById('ind-label').value.trim();
+  var col=document.getElementById('ind-col').value;
+  if(!id||!label){toast('ID와 산업명을 입력하세요','error');return;}
+  if(editingIndIdx<0&&WD.industries.find(function(x){return x.id===id;})){toast('이미 존재하는 ID입니다','error');return;}
+  if(editingIndIdx>=0){WD.industries[editingIndIdx]=Object.assign({},WD.industries[editingIndIdx],{label:label,col:col});}
+  else{WD.industries.push({id:id,label:label,col:col});}
+  persistWD();renderIndTable();renderUcFilter();closeModal('modal-ind');
+  toast(editingIndIdx<0?'산업 추가 완료':'산업 수정 완료','success');
+}
+
+function deleteInd(i){
+  if(!confirm('삭제하시겠습니까?'))return;
+  WD.industries.splice(i,1);persistWD();renderIndTable();
+  toast('삭제 완료');
+}
+
+// ── 유스케이스 탭 ─────────────────────────────────────────
+function renderUcFilter(){
+  var sel=document.getElementById('uc-filter');
+  var cur=sel.value;
+  sel.innerHTML='<option value="">전체 산업</option>'+
+    WD.industries.map(function(ind){
+      return '<option value="'+ind.id+'"'+(cur===ind.id?' selected':'')+'>'+ind.label+'</option>';
+    }).join('');
+}
+
+function renderUcTable(){
+  var filter=document.getElementById('uc-filter').value;
+  var list=filter?WD.uc.filter(function(u){return u.ind===filter;}):WD.uc;
+  document.getElementById('uc-tbody').innerHTML=list.map(function(uc){
+    var idx=WD.uc.indexOf(uc);
+    var ind=WD.industries.find(function(x){return x.id===uc.ind;});
+    var badge=uc.mode==='vod'?'<span class="badge badge-vod">VOD</span>':uc.mode==='live'?'<span class="badge badge-live">LIVE</span>':'<span class="badge badge-both">VOD+LIVE</span>';
+    return '<tr>'+
+      '<td><code style="font-size:11px;color:#9CA3AF">'+uc.id+'</code></td>'+
+      '<td style="font-size:12px">'+(ind?ind.label:uc.ind)+'</td>'+
+      '<td>'+badge+'</td>'+
+      '<td style="font-weight:500;max-width:240px">'+uc.name+'</td>'+
+      '<td style="font-size:12px;color:#4B5563">'+((uc.product||'').substring(0,30))+'</td>'+
+      '<td><button class="btn btn-ghost btn-sm" onclick="editUc('+idx+')">수정</button> '+
+      '<button class="btn btn-danger btn-sm" onclick="deleteUc('+idx+')">삭제</button></td>'+
+    '</tr>';
+  }).join('');
+}
+
+var editingUcIdx=-1;
+function openUcModal(idx){
+  editingUcIdx=idx!==undefined?idx:-1;
+  document.getElementById('modal-uc-title').textContent=editingUcIdx>=0?'유스케이스 수정':'유스케이스 추가';
+  var sel=document.getElementById('uc-ind');
+  sel.innerHTML=WD.industries.map(function(ind){return '<option value="'+ind.id+'">'+ind.label+'</option>';}).join('');
+  if(editingUcIdx>=0){
+    var uc=WD.uc[editingUcIdx];
+    sel.value=uc.ind;
+    document.getElementById('uc-mode').value=uc.mode;
+    document.getElementById('uc-name').value=uc.name||'';
+    document.getElementById('uc-product').value=uc.product||'';
+    document.getElementById('uc-situation').value=uc.situation||'';
+    document.getElementById('uc-position').value=uc.position||'';
+    document.getElementById('uc-customers').value=uc.customers||'';
+  }else{
+    sel.selectedIndex=0;
+    document.getElementById('uc-mode').value='vod';
+    ['uc-name','uc-product','uc-situation','uc-position','uc-customers'].forEach(function(id){document.getElementById(id).value='';});
+  }
+  openModal('modal-uc');
+}
+function editUc(i){openUcModal(i);}
+
+function saveUc(){
+  var name=document.getElementById('uc-name').value.trim();
+  if(!name){toast('유스케이스명을 입력하세요','error');return;}
+  var base=editingUcIdx>=0?WD.uc[editingUcIdx]:{id:'uc'+String(Date.now()).slice(-4),sitVod:[],sitLive:[],sitBoth:[],features:{"보안":[],"스트리밍":[],"플레이어":[],"데이터/개발":[]}};
+  var obj=Object.assign({},base,{
+    ind:document.getElementById('uc-ind').value,
+    mode:document.getElementById('uc-mode').value,
+    name:name,
+    product:document.getElementById('uc-product').value.trim(),
+    situation:document.getElementById('uc-situation').value.trim(),
+    position:document.getElementById('uc-position').value.trim(),
+    customers:document.getElementById('uc-customers').value.trim()
+  });
+  if(editingUcIdx>=0)WD.uc[editingUcIdx]=obj;
+  else WD.uc.push(obj);
+  persistWD();renderUcTable();closeModal('modal-uc');
+  toast(editingUcIdx<0?'유스케이스 추가 완료':'유스케이스 수정 완료','success');
+}
+
+function deleteUc(i){
+  if(!confirm('"'+WD.uc[i].name+'"을(를) 삭제하시겠습니까?'))return;
+  WD.uc.splice(i,1);persistWD();renderUcTable();
+  toast('삭제 완료');
+}
+
+// ── 배포 ─────────────────────────────────────────────────
+function buildDataJs(){
+  return '// ── Admin 자동생성 — 직접 수정하지 마세요 ──\n'+
+    'var SF_TEXTS = '+JSON.stringify(WD.texts,null,2)+';\n\n'+
+    'const INDUSTRIES='+JSON.stringify(WD.industries,null,2)+';\n\n'+
+    'const UC='+JSON.stringify(WD.uc,null,2)+';\n';
+}
+
+async function doDeploy(){
+  var cfg=loadCfg();
+  if(!cfg.token){toast('GitHub Token을 설정 탭에서 입력해 주세요','error');return;}
+  var btn=document.getElementById('deploy-btn');
+  var log=document.getElementById('deploy-log');
+  btn.disabled=true;btn.textContent='⏳ 배포 중...';
+  log.style.display='block';log.textContent='';
+  function addLog(m){log.textContent+=m+'\n';}
+  var apiUrl='https://api.github.com/repos/'+cfg.repo+'/contents/'+cfg.path;
+  var headers={'Authorization':'token '+cfg.token,'Accept':'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28'};
+  addLog('▶ '+cfg.repo+' / '+cfg.path);
+  try{
+    addLog('\n1. SHA 조회...');
+    var r=await fetch(apiUrl+'?ref='+cfg.branch+'&_='+Date.now(),{headers:headers,cache:'no-store'});
+    var sha='';
+    if(r.status===200){var d=await r.json();sha=d.sha;addLog('   SHA: '+sha.slice(0,8)+'... ✅');}
+    else if(r.status===404){addLog('   신규 파일 ✅');}
+    else{addLog('   ❌ 실패('+r.status+')');toast('SHA 조회 실패','error');return;}
+    addLog('\n2. data.js 생성...');
+    var content=buildDataJs();
+    addLog('   '+content.length+' bytes ✅');
+    addLog('\n3. 커밋...');
+    var body={message:'[Admin] 솔루션 파인더 업데이트 ('+new Date().toLocaleString('ko')+')',content:btoa(unescape(encodeURIComponent(content))),branch:cfg.branch};
+    if(sha)body.sha=sha;
+    var pr=await fetch(apiUrl,{method:'PUT',headers:Object.assign({'Content-Type':'application/json'},headers),body:JSON.stringify(body),cache:'no-store'});
+    var pj=await pr.json();
+    if(pr.status===200||pr.status===201){
+      addLog('\n✅ 배포 완료! (1~2분 후 반영)');
+      localStorage.removeItem(CHANGED_KEY);
+      document.getElementById('deploy-banner').style.display='none';
+      toast('배포 완료!','success');
+    }else{
+      addLog('\n❌ 실패('+pr.status+'): '+pj.message);
+      toast('배포 실패: '+pj.message,'error');
+    }
+  }catch(e){addLog('\n❌ 오류: '+e.message);toast('오류 발생','error');}
+  finally{btn.disabled=false;btn.textContent='🚀 GitHub에 배포';}
+}
+
+// ── 설정 ─────────────────────────────────────────────────
+function loadSettingsForm(){
+  var cfg=loadCfg();
+  document.getElementById('cfg-token').value=cfg.token||'';
+  document.getElementById('cfg-repo').value=cfg.repo||'';
+  document.getElementById('cfg-path').value=cfg.path||'';
+  document.getElementById('cfg-branch').value=cfg.branch||'';
+  document.getElementById('cfg-admin-id').value=cfg.adminId||'';
+  document.getElementById('cfg-admin-pw').value='';
+}
+
+function saveSettings(){
+  var cfg=loadCfg();
+  cfg.token=document.getElementById('cfg-token').value.trim();
+  cfg.repo=document.getElementById('cfg-repo').value.trim();
+  cfg.path=document.getElementById('cfg-path').value.trim();
+  cfg.branch=document.getElementById('cfg-branch').value.trim();
+  var newId=document.getElementById('cfg-admin-id').value.trim();
+  var newPw=document.getElementById('cfg-admin-pw').value;
+  if(newId)cfg.adminId=newId;
+  if(newPw)cfg.adminPw=newPw;
+  saveCfg(cfg);
+  toast('설정 저장 완료','success');
+}
+
+async function testGithub(){
+  var cfg=loadCfg();
+  var st=document.getElementById('github-status');
+  st.textContent='테스트 중...';st.style.color='#9CA3AF';
+  try{
+    var r=await fetch('https://api.github.com/repos/'+cfg.repo,{headers:{'Authorization':'token '+cfg.token}});
+    if(r.ok){st.textContent='✅ 연결 성공';st.style.color='#16A34A';}
+    else{st.textContent='❌ 실패('+r.status+')';st.style.color='#DC2626';}
+  }catch(e){st.textContent='❌ 네트워크 오류';st.style.color='#DC2626';}
+}
+
+// ── 모달 유틸 ────────────────────────────────────────────
+function openModal(id){document.getElementById(id).classList.add('open');}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+document.querySelectorAll('.modal-overlay').forEach(function(el){
+  el.addEventListener('click',function(e){if(e.target===el)el.classList.remove('open');});
+});
+
+// ── 토스트 ───────────────────────────────────────────────
+function toast(msg,type){
+  var el=document.getElementById('toast');
+  el.textContent=msg;
+  el.className='toast show'+(type?' '+type:'');
+  setTimeout(function(){el.classList.remove('show');},2500);
+}
+
+// ── 자동 로그인 ──────────────────────────────────────────
+(function(){
+  var id=localStorage.getItem('sf_logged_in');
+  if(id)showApp(id);
+})();
+
+// ── 엔터키 로그인 ─────────────────────────────────────────
+document.addEventListener('DOMContentLoaded',function(){
+  document.getElementById('login-id').addEventListener('keydown',function(e){if(e.key==='Enter')doLogin();});
+  document.getElementById('login-pw').addEventListener('keydown',function(e){if(e.key==='Enter')doLogin();});
+});

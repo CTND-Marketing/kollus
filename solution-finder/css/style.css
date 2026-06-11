@@ -331,7 +331,7 @@ html.mo-open{overflow:hidden}
 .inq{display:none;margin-top:2.5rem}
 .inq.on{display:block}
 .inq-box{padding:2.5rem;background:var(--white);border:1.5px solid var(--gray-200);border-radius:var(--r-2xl);box-shadow:var(--sh-sm)}
-.inq-title{font-size:24px;font-weight:800;color:var(--gray-900);margin-bottom:.625rem;letter-spacing:-.03em}
+.inq-title{font-size:24px;font-weight:800;color:var(--gray-900);margin-bottom:.625rem;letter-spacing:-.03em;word-break:keep-all;line-height:1.35}
 .inq-sub{font-size:15px;color:var(--gray-500);margin-bottom:1.75rem;line-height:1.75}
 .inq-sub b{color:var(--blue);font-weight:700;text-decoration:underline;text-underline-offset:3px}
 .inq-cols{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;align-items:start}
@@ -379,7 +379,7 @@ footer{background:var(--navy);padding:1.75rem 0}
   .inq-cols{grid-template-columns:1fr}
   .rc-grid{gap:10px}
 }
-@media(max-width:600px){
+@media(max-width:600px){.inq-title{font-size:20px}
   .hero{padding:3.5rem 0 2.5rem}
   .hero h1{font-size:1.75rem}
   .hero-progress{display:none}
