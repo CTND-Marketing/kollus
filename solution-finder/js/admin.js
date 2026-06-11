@@ -354,16 +354,18 @@ function enterApp(){
 ---------------------------------------------------------- */
 function showTab(name){
   curTab=name;
-  ['text','industry','uc','deploy','settings'].forEach(function(t){
+  ['text','industry','step2','uc','deploy','settings'].forEach(function(t){
     var pane=$('pane-'+t), btn=$('tab-'+t);
     if(pane) pane.style.display = (t===name)?'block':'none';
     if(btn) btn.classList.toggle('active', t===name);
   });
   // 배포/설정 탭에서는 미리보기 숨김
   var ws=$('workspace');
-  if(ws) ws.classList.toggle('no-preview', !(name==='text'||name==='industry'||name==='uc'));
-  if(name==='industry') renderIndTable();
-  if(name==='uc'){ fillUcFilter(); renderUcTable(); }
+  if(ws) ws.classList.toggle('no-preview', !(name==='text'||name==='industry'||name==='step2'||name==='uc'));
+  if(name==='text'){ setPreviewStep(1, null, []); }
+  if(name==='industry'){ renderIndTable(); setPreviewStep(1, null, []); }
+  if(name==='step2') renderStep2Tab();          // 내부에서 Step 2 로 이동
+  if(name==='uc'){ fillUcFilter(); renderUcTable(); setPreviewStep(3, null, []); }
   if(name==='deploy') renderDeployPreview();
   if(name==='settings') fillSettings();
 }
@@ -577,6 +579,136 @@ function deleteInd(id){
   delete model.icons[id];
   markDirty(); renderIndTable(); setPreviewStep(1,null,[]);
   toast('산업이 삭제되었습니다.','ok');
+}
+
+/* ----------------------------------------------------------
+   9-b. 상황/니즈 탭 (Step 2 전용)
+   - Step 2 상황은 각 UC 의 sitVod/sitLive/sitBoth 를 산업별로 합쳐 자동 생성됨
+   - 여기서 수정하면 같은 txt 를 가진 모든 UC 에 일괄 반영
+---------------------------------------------------------- */
+var s2Industry = null;
+var SIT_KEYS = [{k:'sitVod',label:'VOD',cls:'vod'},{k:'sitLive',label:'LIVE',cls:'live'},{k:'sitBoth',label:'VOD+LIVE',cls:'both'}];
+
+function renderStep2Tab(){
+  if(!s2Industry || !model.industries.some(function(i){return i.id===s2Industry;})){
+    s2Industry = model.industries[0] ? model.industries[0].id : null;
+  }
+  var sel=$('s2-ind'); if(!sel) return;
+  sel.innerHTML = model.industries.map(function(i){
+    return '<option value="'+esc(i.id)+'"'+(i.id===s2Industry?' selected':'')+'>'+esc(i.label)+'</option>';
+  }).join('');
+  sel.onchange=function(){ s2Industry=sel.value; renderStep2List(); setPreviewStep(2, s2Industry, []); };
+  renderStep2List();
+  setPreviewStep(2, s2Industry, []);
+}
+/* 산업별 상황 풀 집계: [{cat, txt, ucs:[id...]}] */
+function aggSits(indId, tabKey){
+  var pool=[];
+  model.uc.filter(function(u){return u.ind===indId;}).forEach(function(u){
+    (u[tabKey]||[]).forEach(function(s){
+      var ex=pool.filter(function(p){return p.txt===s.txt;})[0];
+      if(ex){ if(ex.ucs.indexOf(u.id)<0) ex.ucs.push(u.id); }
+      else pool.push({cat:s.cat, txt:s.txt, ucs:[u.id]});
+    });
+  });
+  var order=['보안','스트리밍','플레이어','데이터/개발','기타'];
+  pool.sort(function(a,b){ return order.indexOf(a.cat)-order.indexOf(b.cat); });
+  return pool;
+}
+function renderStep2List(){
+  var wrap=$('s2-list'); if(!wrap) return;
+  if(!s2Industry){ wrap.innerHTML='<div class="sit-empty" style="padding:14px">먼저 산업을 추가하세요.</div>'; return; }
+  wrap.innerHTML='';
+  SIT_KEYS.forEach(function(t){
+    var pool=aggSits(s2Industry, t.k);
+    var block=document.createElement('div'); block.className='sit-block';
+    var inner='<div class="sit-block-hd '+t.cls+'">'+t.label+' 상황 <span style="opacity:.7;font-weight:600">· '+pool.length+'개</span>'
+      +'<button class="add" data-adds2="'+t.k+'">＋ 추가</button></div>';
+    if(!pool.length){
+      inner+='<div class="sit-empty" style="padding:10px 13px">등록된 상황이 없습니다.</div>';
+    } else {
+      inner+='<div class="sit-rows">'+pool.map(function(p){ return s2Row(t.k,p); }).join('')+'</div>';
+    }
+    block.innerHTML=inner;
+    wrap.appendChild(block);
+  });
+  bindStep2List();
+}
+function s2Row(tabKey, p){
+  var opts=CATS.map(function(c){ return '<option value="'+esc(c)+'"'+(c===p.cat?' selected':'')+'>'+esc(c)+'</option>'; }).join('');
+  return '<div class="s2-row" data-tab="'+tabKey+'" data-old="'+esc(p.txt)+'">'
+    +'<select data-f="cat">'+opts+'</select>'
+    +'<input data-f="txt" value="'+esc(p.txt)+'">'
+    +'<span class="s2-ucs" title="이 상황이 연결된 유스케이스 수">UC '+p.ucs.length+'</span>'
+    +'<button class="del" data-dels2 title="모든 UC 에서 이 상황 제거">✕</button></div>';
+}
+function bindStep2List(){
+  var wrap=$('s2-list');
+  wrap.querySelectorAll('[data-adds2]').forEach(function(b){
+    b.onclick=function(){ openS2Modal(b.dataset.adds2); };
+  });
+  wrap.querySelectorAll('.s2-row').forEach(function(row){
+    var tabKey=row.dataset.tab, oldTxt=row.dataset.old;
+    row.querySelector('[data-f="cat"]').onchange=function(e){ s2Recat(tabKey, oldTxt, e.target.value); markDirty(); refreshStructuralPreview(); };
+    row.querySelector('[data-f="txt"]').onchange=function(e){
+      var nv=e.target.value.trim();
+      if(!nv){ e.target.value=oldTxt; return; }
+      s2Rename(tabKey, oldTxt, nv); row.dataset.old=nv; markDirty(); renderStep2List(); refreshStructuralPreview();
+    };
+    row.querySelector('[data-dels2]').onclick=function(){
+      var cnt=aggSits(s2Industry,tabKey).filter(function(p){return p.txt===oldTxt;})[0];
+      var n=cnt?cnt.ucs.length:0;
+      if(!confirm('"'+oldTxt+'" 상황을 삭제할까요?\n이 산업의 연결된 유스케이스 '+n+'개에서 함께 제거됩니다.')) return;
+      s2Delete(tabKey, oldTxt); markDirty(); renderStep2List(); refreshStructuralPreview();
+      toast('상황이 삭제되었습니다.','ok');
+    };
+  });
+}
+function s2Rename(tabKey, oldTxt, newTxt){
+  model.uc.filter(function(u){return u.ind===s2Industry;}).forEach(function(u){
+    (u[tabKey]||[]).forEach(function(s){ if(s.txt===oldTxt) s.txt=newTxt; });
+  });
+}
+function s2Recat(tabKey, txt, cat){
+  model.uc.filter(function(u){return u.ind===s2Industry;}).forEach(function(u){
+    (u[tabKey]||[]).forEach(function(s){ if(s.txt===txt) s.cat=cat; });
+  });
+}
+function s2Delete(tabKey, txt){
+  model.uc.filter(function(u){return u.ind===s2Industry;}).forEach(function(u){
+    u[tabKey]=(u[tabKey]||[]).filter(function(s){ return s.txt!==txt; });
+  });
+}
+/* 상황 추가 모달 — 어떤 UC 에 연결할지 선택 (상황은 UC 에 속해야 Step2 에 노출됨) */
+var s2AddTab=null;
+function openS2Modal(tabKey){
+  s2AddTab=tabKey;
+  var ucs=model.uc.filter(function(u){return u.ind===s2Industry;});
+  var label=SIT_KEYS.filter(function(t){return t.k===tabKey;})[0].label;
+  var catOpts=CATS.map(function(c){ return '<option value="'+esc(c)+'">'+esc(c)+'</option>'; }).join('');
+  var ucList = ucs.length ? ucs.map(function(u){
+    return '<label class="s2-uc-check"><input type="checkbox" value="'+esc(u.id)+'"> <b>'+esc(u.id)+'</b> · '+esc(u.name)+'</label>';
+  }).join('') : '<div class="form-hint">이 산업에 유스케이스가 없습니다. 먼저 유스케이스를 추가하세요.</div>';
+  $('modal-s2-title').textContent=label+' 상황 추가';
+  $('modal-s2-body').innerHTML=
+    '<div class="form-row"><label>카테고리</label><select id="s2-add-cat">'+catOpts+'</select></div>'
+    +'<div class="form-row"><label>상황 문구 *</label><input type="text" id="s2-add-txt" placeholder="예: 콘텐츠 불법 유출 방지가 필요해요"></div>'
+    +'<div class="form-row"><label>연결할 유스케이스 *<span class="hint" style="font-weight:500;color:#9CA3AF"> · 선택한 UC 의 결과에 이 상황이 매칭됩니다</span></label>'
+    +'<div class="s2-uc-list">'+ucList+'</div></div>';
+  $('modal-s2').classList.add('on');
+}
+function saveS2(){
+  var cat=$('s2-add-cat').value;
+  var txt=$('s2-add-txt').value.trim();
+  if(!txt){ toast('상황 문구를 입력하세요.','err'); return; }
+  var checked=Array.prototype.slice.call($('modal-s2-body').querySelectorAll('.s2-uc-list input:checked')).map(function(c){return c.value;});
+  if(!checked.length){ toast('연결할 유스케이스를 1개 이상 선택하세요.','err'); return; }
+  model.uc.filter(function(u){return checked.indexOf(u.id)>-1;}).forEach(function(u){
+    if(!Array.isArray(u[s2AddTab])) u[s2AddTab]=[];
+    if(!u[s2AddTab].some(function(s){return s.txt===txt;})) u[s2AddTab].push({cat:cat, txt:txt});
+  });
+  markDirty(); closeModal('modal-s2'); renderStep2List(); refreshStructuralPreview();
+  toast('상황이 추가되었습니다.','ok');
 }
 
 /* ----------------------------------------------------------
@@ -919,6 +1051,7 @@ window.saveSettings=saveSettings;
 window.testGithub=testGithub;
 window.closeModal=closeModal;
 window.renderUcTable=renderUcTable;
+window.saveS2=saveS2;
 
 /* ----------------------------------------------------------
    15. 시작
