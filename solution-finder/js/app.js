@@ -372,7 +372,7 @@ function go(n) {
   updateProg(n);
   updateCtx(n);
   if(n===2) renderS2();
-  if(n===3) { showAiLoading(); var s3=document.getElementById('s3'); if(s3) s3.scrollIntoView({behavior:'smooth',block:'start'}); }
+  if(n===3) { renderResults(); var s3=document.getElementById('s3'); if(s3) s3.scrollIntoView({behavior:'smooth',block:'start'}); }
   if(n!==3) { var inqEl=$('inq'); if(inqEl) inqEl.classList.remove('on'); }
 }
 
@@ -467,4 +467,3 @@ function copyPre() {
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init);
   else init();
 })();
-// ── AI 로딩 + Gemini 연동 ───────────────────────────────────
