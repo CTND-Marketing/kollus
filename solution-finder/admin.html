@@ -140,6 +140,23 @@ tr:hover td{background:var(--gray-50)}
 .status-dot.ok{background:var(--green)}
 .status-dot.err{background:var(--red)}
 
+
+/* ── 텍스트 미리보기 (솔루션 파인더 실제 스타일) ── */
+:root {
+  --sf-blue:#3B82F6; --sf-blue-d:#2563EB;
+  --sf-gray-500:#64748B; --sf-gray-900:#0F172A;
+}
+.pv-wrap{background:#F8FAFC;border:1.5px dashed #CBD5E1;border-radius:8px;padding:14px 16px;margin-top:10px}
+.pv-label{font-size:10px;font-weight:700;color:#94A3B8;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px}
+.pv-h1{font-size:clamp(1.4rem,2.5vw,1.8rem);font-weight:800;color:#0F172A;line-height:1.18;letter-spacing:-.04em}
+.pv-h1 em,.pv-h1 i{font-style:normal;color:var(--sf-blue)}
+.pv-hero-desc{font-size:14px;color:#64748B;line-height:1.8}
+.pv-hero-desc b,.pv-hero-desc strong{color:var(--sf-blue-d);font-weight:700}
+.pv-step-title{font-size:clamp(1.2rem,2vw,1.5rem);font-weight:800;color:#0F172A;letter-spacing:-.04em;line-height:1.25}
+.pv-step-sub{font-size:14px;color:#64748B;line-height:1.8}
+.pv-step-sub b,.pv-step-sub strong{color:var(--sf-blue);font-weight:700}
+.pv-inq-title{font-size:22px;font-weight:800;color:#0F172A;letter-spacing:-.03em;line-height:1.35;word-break:keep-all}
+
 /* ── Quill 에디터 커스텀 ── */
 .ql-editor{min-height:80px;font-family:var(--font);font-size:14px}
 .ql-toolbar.ql-snow{border-radius:8px 8px 0 0;border-color:var(--gray-200);background:var(--gray-50)}
@@ -745,15 +762,15 @@ function showTab(name) {
 
 // ── 텍스트 편집 ──────────────────────────────────────────
 var TEXT_FIELDS = [
-  {key:'heroTitle',      label:'히어로 타이틀',       step:'Hero'},
-  {key:'heroDesc',       label:'히어로 설명',          step:'Hero'},
-  {key:'step1Title',     label:'Step 1 타이틀',        step:'Step 1'},
-  {key:'step1Sub',       label:'Step 1 서브타이틀',    step:'Step 1'},
-  {key:'step2Title',     label:'Step 2 타이틀',        step:'Step 2'},
-  {key:'step2Sub',       label:'Step 2 서브타이틀',    step:'Step 2'},
-  {key:'step3Title',     label:'Step 3 타이틀',        step:'Step 3'},
-  {key:'step3Sub',       label:'Step 3 서브타이틀',    step:'Step 3'},
-  {key:'inqTitle',       label:'문의 섹션 타이틀',     step:'문의'},
+  {key:'heroTitle',  label:'히어로 타이틀',    step:'Hero',   cls:'pv-h1'},
+  {key:'heroDesc',   label:'히어로 설명',       step:'Hero',   cls:'pv-hero-desc'},
+  {key:'step1Title', label:'Step 1 타이틀',     step:'Step 1', cls:'pv-step-title'},
+  {key:'step1Sub',   label:'Step 1 서브타이틀', step:'Step 1', cls:'pv-step-sub'},
+  {key:'step2Title', label:'Step 2 타이틀',     step:'Step 2', cls:'pv-step-title'},
+  {key:'step2Sub',   label:'Step 2 서브타이틀', step:'Step 2', cls:'pv-step-sub'},
+  {key:'step3Title', label:'Step 3 타이틀',     step:'Step 3', cls:'pv-step-title'},
+  {key:'step3Sub',   label:'Step 3 서브타이틀', step:'Step 3', cls:'pv-step-sub'},
+  {key:'inqTitle',   label:'문의 섹션 타이틀',  step:'문의',   cls:'pv-inq-title'},
 ];
 
 var quillEditors = {};
@@ -766,11 +783,18 @@ function renderTexts() {
   });
   var html = '';
   Object.keys(steps).forEach(function(step){
-    html += '<div class="card" style="margin-bottom:16px"><div class="card-hd"><span class="card-hd-title">'+step+'</span></div><div class="card-body"><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px">';
+    html += '<div class="card" style="margin-bottom:16px"><div class="card-hd"><span class="card-hd-title">'+step+'</span></div><div class="card-body">';
     steps[step].forEach(function(f){
-      html += '<div class="text-card"><div class="text-card-label">'+f.label+'</div><div class="quill-wrap"><div id="quill-'+f.key+'"></div></div><div class="quill-preview" id="preview-'+f.key+'"></div></div>';
+      html += '<div style="margin-bottom:24px">';
+      html += '<div class="text-card-label" style="margin-bottom:8px">'+f.label+'</div>';
+      html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start">';
+      // 에디터
+      html += '<div><div style="font-size:11px;color:#94A3B8;margin-bottom:4px">✏️ 편집</div><div class="quill-wrap"><div id="quill-'+f.key+'"></div></div></div>';
+      // 미리보기
+      html += '<div><div style="font-size:11px;color:#94A3B8;margin-bottom:4px">👁 실제 화면 미리보기</div><div class="pv-wrap"><div class="'+f.cls+'" id="preview-'+f.key+'"></div></div></div>';
+      html += '</div></div>';
     });
-    html += '</div></div></div>';
+    html += '</div></div>';
   });
   document.getElementById('text-panes').innerHTML = html;
 
@@ -796,11 +820,11 @@ function renderTexts() {
     var raw = WD.texts[f.key] || '';
     q.root.innerHTML = raw;
 
-    // 미리보기 업데이트
+    // 미리보기 업데이트 (실제 렌더링)
     function updatePreview(){
-      var html = q.root.innerHTML;
+      var content = q.root.innerHTML;
       var p = document.getElementById('preview-'+f.key);
-      if (p) p.textContent = 'HTML: ' + html;
+      if (p) p.innerHTML = content === '<p><br></p>' ? '<span style="color:#CBD5E1">내용을 입력하면 여기에 표시됩니다</span>' : content;
     }
     updatePreview();
     q.on('text-change', updatePreview);
