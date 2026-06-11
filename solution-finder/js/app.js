@@ -1,3 +1,24 @@
+// ── SF_TEXTS 반영 ─────────────────────────────────────────
+(function() {
+  if (typeof SF_TEXTS === 'undefined') return;
+  var map = {
+    'sf-heroTitle':  'heroTitle',
+    'sf-heroDesc':   'heroDesc',
+    'sf-step1Title': 'step1Title',
+    'sf-step1Sub':   'step1Sub',
+    'sf-step2Title': 'step2Title',
+    'sf-step2Sub':   'step2Sub',
+    'sf-step3Title': 'step3Title',
+    'sf-step3Sub':   'step3Sub',
+    'sf-inqTitle':   'inqTitle',
+  };
+  Object.keys(map).forEach(function(id) {
+    var el = document.getElementById(id);
+    var val = SF_TEXTS[map[id]];
+    if (el && val) el.innerHTML = val;
+  });
+})();
+
 // ── 유틸 ──────────────────────────────────────────────────
 function $(id){ return document.getElementById(id); }
 
@@ -372,7 +393,7 @@ function go(n) {
   updateProg(n);
   updateCtx(n);
   if(n===2) renderS2();
-  if(n===3) { renderResults(); var s3=document.getElementById('s3'); if(s3) s3.scrollIntoView({behavior:'smooth',block:'start'}); }
+  if(n===3) { showAiLoading(); var s3=document.getElementById('s3'); if(s3) s3.scrollIntoView({behavior:'smooth',block:'start'}); }
   if(n!==3) { var inqEl=$('inq'); if(inqEl) inqEl.classList.remove('on'); }
 }
 
@@ -452,3 +473,97 @@ function copyPre() {
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init);
   else init();
 })();
+// ── AI 로딩 + Gemini 연동 ───────────────────────────────────
+function showAiLoading() {
+  var area = $('results');
+  if(!area) return;
+  area.innerHTML =
+    '<div class="ai-summary-box" id="ai-box">' +
+      '<div class="ai-headline">담당자님을 위한 동영상 솔루션 매칭 결과가 나왔어요!</div>' +
+      '<div id="ai-loading-wrap">' +
+        '<div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">' +
+          '<div class="ai-spinner"></div>' +
+          '<span style="font-size:16px;font-weight:700;color:#1E40AF">산업분야 및 조건 분석 중</span>' +
+        '</div>' +
+        '<div style="font-size:13px;color:#3B82F6;padding-left:26px">담당자님의 분야와 필요한 조건에 맞는 솔루션을 찾고 있습니다.</div>' +
+      '</div>' +
+      '<div id="ai-result-text" style="display:none">' +
+        '<div id="ai-title-text" style="font-size:17px;font-weight:700;color:#1E40AF;line-height:1.4;margin-bottom:.625rem"></div>' +
+        '<div id="ai-body-text" style="font-size:14px;color:#1E3A5F;line-height:1.85"></div>' +
+      '</div>' +
+    '</div>' +
+    '<div id="result-cards" style="display:none"></div>';
+
+  var indObj = INDUSTRIES.filter(function(i){ return i.id===st.ind; })[0];
+
+  if(typeof callGemini === 'function') {
+    callGemini(
+      indObj ? indObj.label : '',
+      st.sits,
+      function(title, body) {
+        $('ai-loading-wrap').style.display = 'none';
+        $('ai-result-text').style.display = 'block';
+        typeAiText($('ai-title-text'), title, function() {
+          typeAiText($('ai-body-text'), body, function() {
+            renderResultCards(indObj);
+          });
+        });
+      },
+      function() {
+        $('ai-loading-wrap').style.display = 'none';
+        $('ai-result-text').style.display = 'block';
+        $('ai-title-text').textContent = '선택하신 조건에 맞는 솔루션을 찾았습니다.';
+        renderResultCards(indObj);
+      }
+    );
+  } else {
+    setTimeout(function() {
+      $('ai-loading-wrap').style.display = 'none';
+      $('ai-result-text').style.display = 'block';
+      $('ai-title-text').textContent = '선택하신 조건에 맞는 솔루션을 찾았습니다.';
+      renderResultCards(indObj);
+    }, 1500);
+  }
+}
+
+function typeAiText(el, text, cb) {
+  if(!el || !text) { if(cb) cb(); return; }
+  var i = 0;
+  el.textContent = '';
+  var iv = setInterval(function() {
+    i += 4;
+    el.textContent = text.slice(0, i) + (i < text.length ? '▍' : '');
+    if(i >= text.length) { clearInterval(iv); el.textContent = text; if(cb) cb(); }
+  }, 16);
+}
+
+function renderResultCards(indObj) {
+  var cardsArea = $('result-cards');
+  if(!cardsArea) return;
+  var indLabel = indObj ? indObj.label : '';
+  var scored = UC.map(function(u){ return {u:u, s:scoreUC(u)}; })
+    .filter(function(x){ return x.s >= 0; })
+    .sort(function(a,b){ return b.s - a.s; });
+  if(!scored.length) {
+    cardsArea.innerHTML = '<div style="padding:4rem 2rem;text-align:center;color:var(--gray-400);border:1.5px dashed var(--gray-200);border-radius:var(--r-xl)">선택한 조건과 일치하는 유스케이스가 없습니다.</div>';
+    cardsArea.style.display = 'block';
+    setInquiry(indObj);
+    return;
+  }
+  var top3 = scored.slice(0, 3);
+  var rest = scored.slice(3);
+  var html = '<div class="r-meta"><div class="r-dot"></div>' + indLabel + ' 영역에서 <b>' + scored.length + '개</b>의 유스케이스가 매칭되었습니다.</div>';
+  html += '<div class="r-sec">추천 매칭 Top ' + Math.min(3, top3.length) + '</div>';
+  html += '<div class="rc-grid">';
+  top3.forEach(function(x, i){ html += buildResultCard(x.u, i, true); });
+  html += '</div>';
+  if(rest.length) {
+    html += '<button class="r-more" id="more-btn" onclick="toggleMore()">▾ 그 외 '+rest.length+'개 유스케이스 더 보기</button>';
+    html += '<div class="r-rest" id="r-rest"><div class="rc-grid rest-grid">';
+    rest.forEach(function(x, i){ html += buildResultCard(x.u, i+3, false); });
+    html += '</div></div>';
+  }
+  cardsArea.innerHTML = html;
+  cardsArea.style.display = 'block';
+  setInquiry(indObj);
+}
