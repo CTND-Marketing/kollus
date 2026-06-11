@@ -1,24 +1,3 @@
-// ── SF_TEXTS 반영 ─────────────────────────────────────────
-(function() {
-  if (typeof SF_TEXTS === 'undefined') return;
-  var map = {
-    'sf-heroTitle':  'heroTitle',
-    'sf-heroDesc':   'heroDesc',
-    'sf-step1Title': 'step1Title',
-    'sf-step1Sub':   'step1Sub',
-    'sf-step2Title': 'step2Title',
-    'sf-step2Sub':   'step2Sub',
-    'sf-step3Title': 'step3Title',
-    'sf-step3Sub':   'step3Sub',
-    'sf-inqTitle':   'inqTitle',
-  };
-  Object.keys(map).forEach(function(id) {
-    var el = document.getElementById(id);
-    var val = SF_TEXTS[map[id]];
-    if (el && val) el.innerHTML = val;
-  });
-})();
-
 // ── 유틸 ──────────────────────────────────────────────────
 function $(id){ return document.getElementById(id); }
 
@@ -464,6 +443,21 @@ function copyPre() {
 // ── 시작 ──────────────────────────────────────────────────
 (function(){
   function init(){
+  // ── SF_TEXTS 반영 ──────────────────────────────────────
+  if (typeof SF_TEXTS !== 'undefined') {
+    var sfMap = {
+      'sf-heroTitle':'heroTitle','sf-heroDesc':'heroDesc',
+      'sf-step1Title':'step1Title','sf-step1Sub':'step1Sub',
+      'sf-step2Title':'step2Title','sf-step2Sub':'step2Sub',
+      'sf-step3Title':'step3Title','sf-step3Sub':'step3Sub',
+      'sf-inqTitle':'inqTitle'
+    };
+    Object.keys(sfMap).forEach(function(id) {
+      var el = document.getElementById(id);
+      var val = SF_TEXTS[sfMap[id]];
+      if (el && val) el.innerHTML = val;
+    });
+  }
     var g=$('ind-grid');
     if(!g){ setTimeout(init,50); return; }
     window.scrollTo(0,0);
