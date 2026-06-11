@@ -8,6 +8,8 @@
 (function(){
 'use strict';
 
+var ADMIN_VERSION = 'v1.3';  // 캐시 확인용 — 헤더와 콘솔에 표시됩니다
+
 /* ----------------------------------------------------------
    0. 상수 / 기본값
 ---------------------------------------------------------- */
@@ -186,7 +188,7 @@ function buildDataJs(){
 /* ----------------------------------------------------------
    5. 라이브 미리보기 엔진
 ---------------------------------------------------------- */
-var PV = { ready:false, mode:'compose', assets:null, step:1, ind:null, sits:[], composeTimer:null, srcLoaded:false, notedInline:false };
+var PV = { ready:false, mode:'compose', assets:null, step:1, ind:null, sits:[], scrollSel:'top', composeTimer:null, srcLoaded:false, notedInline:false };
 
 async function fetchText(url){
   try{ var r=await fetch(url,{cache:'no-store'}); if(!r.ok) return null; return await r.text(); }
@@ -243,8 +245,10 @@ function composePreview(){
     +   'var step='+PV.step+';'
     +   'var ind='+JSON.stringify(PV.ind)+';'
     +   'var sits='+JSON.stringify(PV.sits)+';'
+    +   'var foc='+JSON.stringify(PV.scrollSel||'top')+';'
     +   'if(ind){st.ind=ind;st.sits=sits||[];}'
     +   'if(typeof go==="function"){ if(step===2){if(typeof renderS2==="function")renderS2();go(2);} else if(step===3){go(3);} else {go(1);} }'
+    +   'setTimeout(function(){try{ if(foc==="top"){window.scrollTo(0,0);} else { var fe=document.querySelector(foc); if(fe) fe.scrollIntoView({block:"start"}); } }catch(e){}},60);'
     + '}catch(e){console.error(e);}}'
     + 'if(document.readyState==="complete")go2();else window.addEventListener("load",go2);})();';
 
@@ -287,6 +291,8 @@ function composeSrc(){
       if(PV.step===3 && PV.ind){ w.st={ind:PV.ind,sits:PV.sits||[]}; w.go(3); }
       else w.go(PV.step);
     }
+    var foc=PV.scrollSel||'top';
+    if(w){ setTimeout(function(){ try{ if(foc==='top'){w.scrollTo(0,0);} else { var fe=d.querySelector(foc); if(fe) fe.scrollIntoView({block:'start'}); } }catch(e){} },60); }
   }catch(e){}
 }
 /* 텍스트만 즉시 반영 (iframe 리로드 없이) */
@@ -299,7 +305,7 @@ function livePatchTexts(){
     else schedulePreview();
   }catch(e){ schedulePreview(); }
 }
-function setPreviewStep(n, ind, sits){
+function setPreviewStep(n, ind, sits, focusSel){
   // 텍스트 탭에서 Step2·3 로 이동 시, 비어 보이지 않도록 기본 산업/상황 채움
   if(n>=2 && !ind && model.industries[0]){
     ind = model.industries[0].id;
@@ -309,6 +315,8 @@ function setPreviewStep(n, ind, sits){
     } else { sits = []; }
   }
   PV.step=n; PV.ind=ind||null; PV.sits=sits||[];
+  // 미리보기에서 보여줄 위치: 기본은 단계 패널로 스크롤(Step1 은 상단 히어로)
+  PV.scrollSel = focusSel || (n===1?'top':n===2?'#s2':'#s3');
   document.querySelectorAll('.pv-steps button').forEach(function(b){
     b.classList.toggle('on', parseInt(b.dataset.s,10)===n);
   });
@@ -362,10 +370,10 @@ function showTab(name){
   // 배포/설정 탭에서는 미리보기 숨김
   var ws=$('workspace');
   if(ws) ws.classList.toggle('no-preview', !(name==='text'||name==='industry'||name==='step2'||name==='uc'));
-  if(name==='text'){ setPreviewStep(1, null, []); }
-  if(name==='industry'){ renderIndTable(); setPreviewStep(1, null, []); }
+  if(name==='text'){ setPreviewStep(1, null, [], 'top'); }
+  if(name==='industry'){ renderIndTable(); setPreviewStep(1, null, [], '#s1'); }
   if(name==='step2') renderStep2Tab();          // 내부에서 Step 2 로 이동
-  if(name==='uc'){ fillUcFilter(); renderUcTable(); setPreviewStep(3, null, []); }
+  if(name==='uc'){ fillUcFilter(); renderUcTable(); setPreviewStep(3, null, [], '#s3'); }
   if(name==='deploy') renderDeployPreview();
   if(name==='settings') fillSettings();
 }
@@ -374,19 +382,19 @@ function showTab(name){
    8. 텍스트 탭
 ---------------------------------------------------------- */
 var TEXT_GROUPS = [
-  {key:'hero', step:1, num:'H', title:'히어로 (상단 영역)', fields:[
+  {key:'hero', step:1, focus:'top', num:'H', title:'히어로 (상단 영역)', fields:[
     {path:'hero.badge', label:'배지', type:'input'},
     {path:'hero.h1', label:'메인 헤드라인', type:'textarea', html:true},
     {path:'hero.desc', label:'설명 문구', type:'textarea', html:true},
     {path:'hero.chips', label:'키워드 칩 (6개)', type:'chips'},
     {path:'hero.progress', label:'진행 단계 라벨 (3개)', type:'progress'}
   ]},
-  {key:'step1', step:1, num:'1', title:'Step 1 · 산업 선택', fields:[
+  {key:'step1', step:1, focus:'#s1', num:'1', title:'Step 1 · 산업 선택', fields:[
     {path:'step1.tag', label:'태그', type:'input'},
     {path:'step1.title', label:'타이틀', type:'input'},
     {path:'step1.sub', label:'서브타이틀', type:'textarea', html:true}
   ]},
-  {key:'step2', step:2, num:'2', title:'Step 2 · 상황 / 니즈', fields:[
+  {key:'step2', step:2, focus:'#s2', num:'2', title:'Step 2 · 상황 / 니즈', fields:[
     {path:'step2.tag', label:'태그', type:'input'},
     {path:'step2.title', label:'타이틀', type:'input'},
     {path:'step2.sub', label:'서브타이틀', type:'textarea', html:true},
@@ -400,17 +408,17 @@ var TEXT_GROUPS = [
     {path:'step2.desc.live', label:'LIVE 모드 설명', type:'textarea'},
     {path:'step2.desc.both', label:'VOD+LIVE 모드 설명', type:'textarea'}
   ]},
-  {key:'step3', step:3, num:'3', title:'Step 3 · 솔루션 결과', fields:[
+  {key:'step3', step:3, focus:'#s3', num:'3', title:'Step 3 · 솔루션 결과', fields:[
     {path:'step3.tag', label:'태그', type:'input'},
     {path:'step3.title', label:'타이틀', type:'input'},
     {path:'step3.sub', label:'서브타이틀', type:'textarea', html:true},
     {path:'step3.headline', label:'결과 헤드라인', type:'input'}
   ]},
-  {key:'inquiry', step:3, num:'Q', title:'문의 영역', fields:[
+  {key:'inquiry', step:3, focus:'#inq', num:'Q', title:'문의 영역', fields:[
     {path:'inquiry.title', label:'문의 타이틀', type:'textarea', html:true},
     {path:'inquiry.sub', label:'문의 설명', type:'textarea', html:true}
   ]},
-  {key:'footer', step:3, num:'F', title:'푸터', fields:[
+  {key:'footer', step:3, focus:'footer', num:'F', title:'푸터', fields:[
     {path:'footer.txt', label:'푸터 문구', type:'input'}
   ]}
 ];
@@ -437,7 +445,7 @@ function renderTextTab(){
     // 그룹 접기/펼치기 + 미리보기 step 이동
     box.querySelector('.txt-group-hd').addEventListener('click', function(){
       box.classList.toggle('collapsed');
-      if(!box.classList.contains('collapsed')) setPreviewStep(g.step, null, []);
+      if(!box.classList.contains('collapsed')) setPreviewStep(g.step, null, [], g.focus||(g.step===1?'top':g.step===2?'#s2':'#s3'));
     });
     wrap.appendChild(box);
   });
@@ -597,9 +605,9 @@ function renderStep2Tab(){
   sel.innerHTML = model.industries.map(function(i){
     return '<option value="'+esc(i.id)+'"'+(i.id===s2Industry?' selected':'')+'>'+esc(i.label)+'</option>';
   }).join('');
-  sel.onchange=function(){ s2Industry=sel.value; renderStep2List(); setPreviewStep(2, s2Industry, []); };
+  sel.onchange=function(){ s2Industry=sel.value; renderStep2List(); setPreviewStep(2, s2Industry, [], "#s2"); };
   renderStep2List();
-  setPreviewStep(2, s2Industry, []);
+  setPreviewStep(2, s2Industry, [], "#s2");
 }
 /* 산업별 상황 풀 집계: [{cat, txt, ucs:[id...]}] */
 function aggSits(indId, tabKey){
@@ -1057,6 +1065,8 @@ window.saveS2=saveS2;
    15. 시작
 ---------------------------------------------------------- */
 document.addEventListener('DOMContentLoaded', function(){
+  try{ console.log('%cKOLLUS Solution Finder Admin '+ADMIN_VERSION,'color:#2563EB;font-weight:bold'); }catch(e){}
+  var hv=$('header-ver'); if(hv) hv.textContent=ADMIN_VERSION;
   bindPreviewBar();
   // 로그인 엔터 키
   ['login-id','login-pw'].forEach(function(id){
