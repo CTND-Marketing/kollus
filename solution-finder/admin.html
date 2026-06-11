@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>솔루션 파인더 Admin</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -138,6 +139,14 @@ tr:hover td{background:var(--gray-50)}
 .status-dot{width:8px;height:8px;border-radius:50%;background:var(--gray-300);flex-shrink:0}
 .status-dot.ok{background:var(--green)}
 .status-dot.err{background:var(--red)}
+
+/* ── Quill 에디터 커스텀 ── */
+.ql-editor{min-height:80px;font-family:var(--font);font-size:14px}
+.ql-toolbar.ql-snow{border-radius:8px 8px 0 0;border-color:var(--gray-200);background:var(--gray-50)}
+.ql-container.ql-snow{border-radius:0 0 8px 8px;border-color:var(--gray-200)}
+.ql-container.ql-snow:focus-within{border-color:var(--blue)}
+.quill-wrap{border-radius:8px;overflow:hidden}
+.quill-preview{font-size:11px;color:var(--gray-400);margin-top:4px;padding:4px 8px;background:var(--gray-50);border-radius:4px;word-break:break-all}
 </style>
 <script>
 // ── 인라인 data.js ─────────────────────────────────────
@@ -405,6 +414,7 @@ var st = { ind: null, sits: [] };
 var curTab = 'vod';
 var IND_ICONS = { edu:'🎓', corp:'🏢', bcast:'📡', comm:'🛒', live:'🔴', ott:'🎬', event:'🎭' };
 </script>
+<script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
 </head>
 <body>
 
@@ -746,6 +756,8 @@ var TEXT_FIELDS = [
   {key:'inqTitle',       label:'문의 섹션 타이틀',     step:'문의'},
 ];
 
+var quillEditors = {};
+
 function renderTexts() {
   var steps = {};
   TEXT_FIELDS.forEach(function(f){
@@ -754,20 +766,58 @@ function renderTexts() {
   });
   var html = '';
   Object.keys(steps).forEach(function(step){
-    html += '<div class="card" style="margin-bottom:16px"><div class="card-hd"><span class="card-hd-title">'+step+'</span></div><div class="card-body"><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px">';
+    html += '<div class="card" style="margin-bottom:16px"><div class="card-hd"><span class="card-hd-title">'+step+'</span></div><div class="card-body"><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px">';
     steps[step].forEach(function(f){
-      var val = (WD.texts[f.key]||'').replace(/<br>/g,'\n');
-      html += '<div class="text-card"><div class="text-card-label">'+f.label+'</div><textarea id="txt-'+f.key+'" rows="3">'+escHtml(val)+'</textarea></div>';
+      html += '<div class="text-card"><div class="text-card-label">'+f.label+'</div><div class="quill-wrap"><div id="quill-'+f.key+'"></div></div><div class="quill-preview" id="preview-'+f.key+'"></div></div>';
     });
     html += '</div></div></div>';
   });
   document.getElementById('text-panes').innerHTML = html;
+
+  // Quill 인스턴스 생성
+  quillEditors = {};
+  var toolbarOptions = [
+    ['bold', 'italic', 'underline'],
+    [{ 'color': [] }, { 'background': [] }],
+    [{ 'size': ['small', false, 'large', 'huge'] }],
+    ['link', 'clean']
+  ];
+
+  TEXT_FIELDS.forEach(function(f){
+    var el = document.getElementById('quill-'+f.key);
+    if (!el) return;
+    var q = new Quill('#quill-'+f.key, {
+      theme: 'snow',
+      modules: { toolbar: toolbarOptions },
+      placeholder: '내용을 입력하세요...'
+    });
+
+    // 현재 값 로드 (HTML → Quill)
+    var raw = WD.texts[f.key] || '';
+    q.root.innerHTML = raw;
+
+    // 미리보기 업데이트
+    function updatePreview(){
+      var html = q.root.innerHTML;
+      var p = document.getElementById('preview-'+f.key);
+      if (p) p.textContent = 'HTML: ' + html;
+    }
+    updatePreview();
+    q.on('text-change', updatePreview);
+
+    quillEditors[f.key] = q;
+  });
 }
 
 function saveTexts() {
   TEXT_FIELDS.forEach(function(f){
-    var el = document.getElementById('txt-'+f.key);
-    if (el) WD.texts[f.key] = el.value.replace(/\n/g,'<br>');
+    var q = quillEditors[f.key];
+    if (q) {
+      var html = q.root.innerHTML;
+      // Quill 빈 상태 처리
+      if (html === '<p><br></p>') html = '';
+      WD.texts[f.key] = html;
+    }
   });
   persistWD();
   toast('텍스트 저장 완료', 'success');
