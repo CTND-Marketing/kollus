@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>솔루션 파인더 Admin</title>
+<link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -138,6 +139,25 @@ tr:hover td{background:var(--gray-50)}
 .status-dot{width:8px;height:8px;border-radius:50%;background:var(--gray-300);flex-shrink:0}
 .status-dot.ok{background:var(--green)}
 .status-dot.err{background:var(--red)}
+
+/* ── Quill 에디터 ── */
+.ql-editor{min-height:90px;font-family:var(--font);font-size:14px;line-height:1.7}
+.ql-toolbar.ql-snow{border-radius:8px 8px 0 0;border-color:var(--gray-200);background:var(--gray-50);padding:6px 8px}
+.ql-container.ql-snow{border-radius:0 0 8px 8px;border-color:var(--gray-200);font-family:var(--font)}
+.ql-container.ql-snow:focus-within,.ql-toolbar.ql-snow:focus-within{border-color:var(--blue)}
+/* ── 실제 화면 미리보기 스타일 ── */
+:root{--sf-blue:#3B82F6;--sf-blue-d:#2563EB;--sf-gray:#64748B;--sf-dark:#0F172A}
+.pv-box{background:#F8FAFC;border:1.5px dashed #CBD5E1;border-radius:8px;padding:14px 16px;min-height:80px}
+.pv-h1{font-size:1.6rem;font-weight:800;color:var(--sf-dark);line-height:1.2;letter-spacing:-.04em}
+.pv-h1 em,.pv-h1 i{font-style:normal;color:var(--sf-blue)}
+.pv-desc{font-size:14px;color:var(--sf-gray);line-height:1.8}
+.pv-desc b,.pv-desc strong{color:var(--sf-blue-d);font-weight:700}
+.pv-title{font-size:1.4rem;font-weight:800;color:var(--sf-dark);letter-spacing:-.04em;line-height:1.25}
+.pv-sub{font-size:14px;color:var(--sf-gray);line-height:1.8}
+.pv-sub b,.pv-sub strong{color:var(--sf-blue);font-weight:700}
+.pv-inq{font-size:20px;font-weight:800;color:var(--sf-dark);letter-spacing:-.03em;line-height:1.35;word-break:keep-all}
+.pv-empty{color:#CBD5E1;font-size:13px}
+
 </style>
 <script>
 // ── 인라인 data.js ─────────────────────────────────────
@@ -405,6 +425,7 @@ var st = { ind: null, sits: [] };
 var curTab = 'vod';
 var IND_ICONS = { edu:'🎓', corp:'🏢', bcast:'📡', comm:'🛒', live:'🔴', ott:'🎬', event:'🎭' };
 </script>
+<script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
 </head>
 <body>
 
@@ -735,16 +756,18 @@ function showTab(name) {
 
 // ── 텍스트 편집 ──────────────────────────────────────────
 var TEXT_FIELDS = [
-  {key:'heroTitle',      label:'히어로 타이틀',       step:'Hero'},
-  {key:'heroDesc',       label:'히어로 설명',          step:'Hero'},
-  {key:'step1Title',     label:'Step 1 타이틀',        step:'Step 1'},
-  {key:'step1Sub',       label:'Step 1 서브타이틀',    step:'Step 1'},
-  {key:'step2Title',     label:'Step 2 타이틀',        step:'Step 2'},
-  {key:'step2Sub',       label:'Step 2 서브타이틀',    step:'Step 2'},
-  {key:'step3Title',     label:'Step 3 타이틀',        step:'Step 3'},
-  {key:'step3Sub',       label:'Step 3 서브타이틀',    step:'Step 3'},
-  {key:'inqTitle',       label:'문의 섹션 타이틀',     step:'문의'},
+  {key:'heroTitle',      label:'히어로 타이틀',       step:'Hero',   cls:'pv-h1'},
+  {key:'heroDesc',       label:'히어로 설명',          step:'Hero',   cls:'pv-desc'},
+  {key:'step1Title',     label:'Step 1 타이틀',        step:'Step 1', cls:'pv-title'},
+  {key:'step1Sub',       label:'Step 1 서브타이틀',    step:'Step 1', cls:'pv-sub'},
+  {key:'step2Title',     label:'Step 2 타이틀',        step:'Step 2', cls:'pv-title'},
+  {key:'step2Sub',       label:'Step 2 서브타이틀',    step:'Step 2', cls:'pv-sub'},
+  {key:'step3Title',     label:'Step 3 타이틀',        step:'Step 3', cls:'pv-title'},
+  {key:'step3Sub',       label:'Step 3 서브타이틀',    step:'Step 3', cls:'pv-sub'},
+  {key:'inqTitle',       label:'문의 섹션 타이틀',     step:'문의',   cls:'pv-inq'},
 ];
+
+var quillEditors = {};
 
 function renderTexts() {
   var steps = {};
@@ -752,22 +775,76 @@ function renderTexts() {
     if (!steps[f.step]) steps[f.step] = [];
     steps[f.step].push(f);
   });
+
   var html = '';
   Object.keys(steps).forEach(function(step){
-    html += '<div class="card" style="margin-bottom:16px"><div class="card-hd"><span class="card-hd-title">'+step+'</span></div><div class="card-body"><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px">';
+    html += '<div class="card" style="margin-bottom:20px">';
+    html += '<div class="card-hd"><span class="card-hd-title">'+step+'</span></div>';
+    html += '<div class="card-body">';
     steps[step].forEach(function(f){
-      var val = (WD.texts[f.key]||'').replace(/<br>/g,'\n');
-      html += '<div class="text-card"><div class="text-card-label">'+f.label+'</div><textarea id="txt-'+f.key+'" rows="3">'+escHtml(val)+'</textarea></div>';
+      html += '<div style="margin-bottom:28px">';
+      html += '<div class="text-card-label" style="margin-bottom:8px">'+f.label+'</div>';
+      html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start">';
+      html += '<div>';
+      html += '<div style="font-size:11px;color:#94A3B8;margin-bottom:4px">✏️ 편집</div>';
+      html += '<div id="quill-'+f.key+'"></div>';
+      html += '</div>';
+      html += '<div>';
+      html += '<div style="font-size:11px;color:#94A3B8;margin-bottom:4px">👁 실제 화면 미리보기</div>';
+      html += '<div class="pv-box"><div class="'+(f.cls||'pv-sub')+'" id="pv-'+f.key+'"><span class="pv-empty">내용을 입력하면 여기에 표시됩니다</span></div></div>';
+      html += '</div>';
+      html += '</div></div>';
     });
-    html += '</div></div></div>';
+    html += '</div></div>';
   });
+
   document.getElementById('text-panes').innerHTML = html;
+
+  // Quill 인스턴스 생성
+  quillEditors = {};
+  var toolbar = [
+    ['bold','italic','underline'],
+    [{'color':[]},{'background':[]}],
+    [{'size':['small',false,'large','huge']}],
+    ['link','clean']
+  ];
+
+  TEXT_FIELDS.forEach(function(f){
+    var container = document.getElementById('quill-'+f.key);
+    if (!container) return;
+
+    var q = new Quill('#quill-'+f.key, {
+      theme: 'snow',
+      modules: {toolbar: toolbar},
+      placeholder: '내용을 입력하세요...'
+    });
+
+    // 현재 값 로드
+    var raw = WD.texts[f.key] || '';
+    q.root.innerHTML = raw;
+
+    // 미리보기 즉시 반영
+    function updatePv() {
+      var pv = document.getElementById('pv-'+f.key);
+      if (!pv) return;
+      var content = q.root.innerHTML;
+      pv.innerHTML = (!content || content === '<p><br></p>')
+        ? '<span class="pv-empty">내용을 입력하면 여기에 표시됩니다</span>'
+        : content;
+    }
+    updatePv();
+    q.on('text-change', updatePv);
+    quillEditors[f.key] = q;
+  });
 }
 
 function saveTexts() {
   TEXT_FIELDS.forEach(function(f){
-    var el = document.getElementById('txt-'+f.key);
-    if (el) WD.texts[f.key] = el.value.replace(/\n/g,'<br>');
+    var q = quillEditors[f.key];
+    if (q) {
+      var html = q.root.innerHTML;
+      WD.texts[f.key] = (html === '<p><br></p>') ? '' : html;
+    }
   });
   persistWD();
   toast('텍스트 저장 완료', 'success');
@@ -967,7 +1044,6 @@ function buildDataJs() {
 async function doDeploy() {
   var cfg = loadCfg();
   if (!cfg.token) { toast('GitHub Token을 설정 탭에서 입력해 주세요','error'); return; }
-  if (!cfg.repo || !cfg.path) { toast('설정 탭에서 Repository와 파일 경로를 확인해 주세요','error'); return; }
 
   var btn = document.getElementById('deploy-btn');
   var log = document.getElementById('deploy-log');
@@ -977,76 +1053,52 @@ async function doDeploy() {
   function addLog(msg){ log.textContent += msg+'\n'; }
 
   try {
-    var apiBase = 'https://api.github.com/repos/'+cfg.repo+'/contents/'+cfg.path;
-    var headers = {
-      'Authorization': 'token '+cfg.token,
-      'Accept': 'application/vnd.github+json',
-      'Cache-Control': 'no-cache'
-    };
-
-    addLog('경로: '+cfg.repo+' / '+cfg.path);
-    addLog('브랜치: '+cfg.branch);
-    addLog('');
     addLog('1. 현재 파일 SHA 조회 중...');
-
-    // SHA 항상 새로 가져오기 (캐시 방지용 timestamp)
-    var shaRes = await fetch(apiBase+'?ref='+cfg.branch+'&t='+Date.now(), {headers: headers});
-
+    var getRes = await fetch(
+      'https://api.github.com/repos/'+cfg.repo+'/contents/'+cfg.path+'?ref='+cfg.branch,
+      {headers:{'Authorization':'Bearer '+cfg.token,'Accept':'application/vnd.github+json'}}
+    );
     var sha = '';
-    if (shaRes.ok) {
-      var shaData = await shaRes.json();
-      sha = shaData.sha;
-      addLog('   ✅ SHA: '+sha.substring(0,12)+'...');
-    } else if (shaRes.status === 404) {
-      addLog('   신규 파일로 생성합니다');
+    if (getRes.ok) {
+      var fileData = await getRes.json();
+      sha = fileData.sha;
+      addLog('   SHA: '+sha.substring(0,8)+'...');
     } else {
-      var shaErr = await shaRes.json();
-      addLog('   ❌ SHA 조회 실패: '+shaRes.status+' '+JSON.stringify(shaErr));
-      toast('SHA 조회 실패','error');
-      return;
+      addLog('   (신규 파일)');
     }
 
-    addLog('');
     addLog('2. data.js 생성 중...');
     var content = buildDataJs();
     var encoded = btoa(unescape(encodeURIComponent(content)));
-    addLog('   ✅ '+content.length+' bytes');
 
-    addLog('');
-    addLog('3. GitHub 커밋 중...');
+    addLog('3. GitHub에 커밋 중...');
     var body = {
-      message: '[Admin] 솔루션 파인더 업데이트 ('+new Date().toLocaleString('ko')+')',
+      message: '[Admin] 솔루션 파인더 데이터 업데이트 ('+new Date().toLocaleString('ko')+')',
       content: encoded,
-      branch: cfg.branch
+      branch: cfg.branch,
     };
     if (sha) body.sha = sha;
 
-    var putRes = await fetch(apiBase, {
-      method: 'PUT',
-      headers: Object.assign({}, headers, {'Content-Type': 'application/json'}),
-      body: JSON.stringify(body)
-    });
+    var putRes = await fetch(
+      'https://api.github.com/repos/'+cfg.repo+'/contents/'+cfg.path,
+      {method:'PUT', headers:{'Authorization':'Bearer '+cfg.token,'Accept':'application/vnd.github+json','Content-Type':'application/json'}, body:JSON.stringify(body)}
+    );
 
     if (putRes.ok) {
-      addLog('');
-      addLog('✅ 배포 완료!');
-      addLog('GitHub Pages 반영까지 1~2분 소요됩니다.');
+      addLog('4. ✅ 배포 완료!');
       localStorage.removeItem(CHANGED_KEY);
       document.getElementById('deploy-banner').style.display = 'none';
       toast('GitHub 배포 완료!','success');
     } else {
       var err = await putRes.json();
-      addLog('');
-      addLog('❌ 커밋 실패: '+putRes.status);
-      addLog(JSON.stringify(err, null, 2));
+      addLog('❌ 오류: '+JSON.stringify(err));
       toast('배포 실패: '+err.message,'error');
     }
   } catch(e) {
-    addLog('❌ 오류: '+e.message);
-    toast('오류 발생','error');
+    addLog('❌ 네트워크 오류: '+e.message);
+    toast('네트워크 오류','error');
   } finally {
-    btn.disabled = false;
-    btn.textContent = '🚀 GitHub에 배포';
+    btn.disabled = false; btn.textContent = '🚀 GitHub에 배포';
   }
 }
 
